@@ -66,7 +66,7 @@ public class LoginController {
                 session.setAttribute("loginUser",stuname);
                 session.setAttribute("User","student");
                 session.setAttribute("Main",loginStu);
-                return "redirect:/studentMain";
+                return "redirect:/";
             } else {
                 //登录失败
                 map.put("msg", "用户名/密码错误");
@@ -107,7 +107,7 @@ public class LoginController {
                 //登录成功，防止表单重复提交，重定向到学生后台
                 session.setAttribute("loginUser",tname);
                 session.setAttribute("User","teacher");
-                return "redirect:/teacherMain";
+                return "redirect:/";
             } else {
                 //登录失败
                 map.put("msg", "用户名/密码错误");
@@ -148,7 +148,7 @@ public class LoginController {
                 //登录成功，防止表单重复提交，重定向到管理员后台
                 session.setAttribute("loginUser",aname);
                 session.setAttribute("User","admin");
-                return "redirect:/adminMain";
+                return "redirect:/";
             } else {
                 //登录失败
                 map.put("msg", "用户名/密码错误");

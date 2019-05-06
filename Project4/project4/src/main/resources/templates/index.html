@@ -60,11 +60,11 @@
                       <a id="logoutStudent" th:href="@{/logout}" class="btn btn-primary">注销</a>
                     </div>
                     <div th:case="teacher">
-                      <a id="teacherMain" th:href="@{/studentMain}" class="btn btn-primary">教师管理界面</a>
+                      <a id="teacherMain" th:href="@{/teacherMain}" class="btn btn-primary">教师管理界面</a>
                       <a id="logoutTeacher" th:href="@{/logout}" class="btn btn-primary">注销</a>
                     </div>
                     <div th:case="admin">
-                      <a id="adminMain" th:href="@{/studentMain}" class="btn btn-primary">管理员后台界面</a>
+                      <a id="adminMain" th:href="@{/adminMain}" class="btn btn-primary">管理员后台界面</a>
                       <a id="logoutAdmin" th:href="@{/logout}" class="btn btn-primary">注销</a>
                     </div>
                   </div>

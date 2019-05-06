@@ -13,7 +13,7 @@ public class AdminLoginHandlerInterceptor implements HandlerInterceptor {
     //目标方法执行之前
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException, IOException {
-        Object user = request.getSession().getAttribute("loginUser");
+        Object user = request.getSession().getAttribute("User");
         if(user != "admin"){
             //不是管理员身份,返回登录页面
             request.setAttribute("msg","您不是管理员，没有权限，请先用管理员账户登录");

@@ -5,7 +5,6 @@ spring:
     password: 123
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
-
     max-wait: 10000
     #下面为连接池的补充设置,应用到上面所有数据源中
     #初始化大小，最小，最大
