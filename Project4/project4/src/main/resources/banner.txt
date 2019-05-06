@@ -1,0 +1,6 @@
+${AnsiColor.RED}
+
+项目：工程实践4-课程过程化考核系统
+开发小组：好好学习天天向上组
+
+----SpringBoot版本----${spring-boot.version}

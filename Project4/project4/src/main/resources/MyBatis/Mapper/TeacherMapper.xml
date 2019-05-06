@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- sql的映射文件 mapper-->
+<mapper namespace="com.study.project4.com.dao.TeacherMapper">
+    <select id="getTeaAll" resultType="Teacher">
+        select * from teacher
+    </select>
+    <select id="getTeaByID" resultType="Teacher">
+        select * from teacher
+        where tid = #{id}
+    </select>
+    <insert id="addTeacher" useGeneratedKeys="true" keyProperty="tid">
+        insert into teacher(tname,tpsw)
+        values(#{tname},#{tpsw})
+    </insert>
+</mapper>

@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    max-wait: 10000
+    #下面为连接池的补充设置,应用到上面所有数据源中
+    #初始化大小，最小，最大
+    initialSize: 1
+    minIdle: 3
+    maxActive: 20
+    #配置获取连接等待的超时时间
+    maxWait: 60000
+    #配置多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+
+ahaohe:
+  title: 工程实践4-API文档
+  description: API-swagger框架
+  version: 1.0.0
+  name: 好好学习天天向上组
+  url: https://ahh666.com
+  email: ahaohe@foxmail.com
+
+mybatis:
+  config-location: classpath:MyBatis/mybatis.cfg.xml
+  mapper-locations: classpath:MyBatis/Mapper/*.xml
+  #映射类所在的包
+  type-aliases-package: com.study.project4.com.entity
