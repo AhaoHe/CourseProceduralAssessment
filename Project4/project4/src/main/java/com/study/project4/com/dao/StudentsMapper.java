@@ -19,7 +19,7 @@ public interface StudentsMapper {
     public  Student getStuByid(Integer id);
 
     @Options(useGeneratedKeys = true,keyProperty = "id")
-    @Insert("insert into Student(sname,spsw,sclass) values(#{sname},#{spsw},#{sclass})")
+    @Insert("insert into Student(sname,spsw,sclass,ssex) values(#{sname},#{spsw},#{sclass},#{ssex})")
     public  int insetStu(Student student);
 
 }

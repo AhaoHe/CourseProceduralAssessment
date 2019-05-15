@@ -12,7 +12,7 @@
         where tid = #{id}
     </select>
     <insert id="addTeacher" useGeneratedKeys="true" keyProperty="tid">
-        insert into teacher(tname,tpsw)
-        values(#{tname},#{tpsw})
+        insert into teacher(tname,tpsw,tsex)
+        values(#{tname},#{tpsw},#{tsex})
     </insert>
 </mapper>

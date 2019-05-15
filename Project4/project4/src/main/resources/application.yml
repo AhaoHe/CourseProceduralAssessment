@@ -38,3 +38,10 @@ mybatis:
   mapper-locations: classpath:MyBatis/Mapper/*.xml
   #映射类所在的包
   type-aliases-package: com.study.project4.com.entity
+
+#分页插件
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql

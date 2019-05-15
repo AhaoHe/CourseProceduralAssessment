@@ -5,6 +5,15 @@ public class Student {
     String sname;
     String spsw;
     String sclass;
+    int ssex;
+
+    public int getSsex() {
+        return ssex;
+    }
+
+    public void setSsex(int ssex) {
+        this.ssex = ssex;
+    }
 
     public int getId() {
         return id;

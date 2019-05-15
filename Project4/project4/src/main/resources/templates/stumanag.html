@@ -80,26 +80,44 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a href="stumanag.html"> </i>课程管理 </a></li>
-                    <li><a href="charts.html"></i>我的信息 </a></li>
-                    <li><a href="index.html"> <i class="icon-interface-windows"></i>返回主界面 </a></li>
+                    <li class="active"><a th:href="@{/studentMain}"> </i>我的信息 </a></li>
+                    <li><a th:href="@{/students/AllCourse}"></i>课程管理 </a></li>
+                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主界面 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
+              <h2 class="no-margin-bottom">我的信息</h2>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
 
 
           <div >
+            <div class="title">
+              <p style="width: 60px; position: absolute;">姓名:<p style="margin-left: 60px;" th:text="${session.Main.getSname()}"></p></p>
+              <p style="width: 60px; position: absolute;">学号:<p style="margin-left: 60px;" th:text="${session.loginUser}"></p></p>
+              <p style="width: 60px; position: absolute;">班级:<p style="margin-left: 60px;" th:text="${session.Main.getSclass()}"></p></p>
+            </div>
+            <h1 class="h4" align="center">所选课程</h1>
             <table class="imagetable" border="1"align="center">
 
-              <tr class="font"><td>课程名称</td><td>课程编号</td><td>老师名称</td></tr>
+              <tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>性别</th><th>操作</th></tr>
+              <tr th:each="c:${courses}">
+                <td th:text="${c.getCid()}"></td>
+                <td th:text="${c.getCourse()}"></td>
+                <td th:text="${c.getTeacher().getTname()}"></td>
 
+                <!-- 判断男女 -->
+                <td th:if="${c.getTeacher().getTsex()==1}">男</td>
+                <td th:if="${c.getTeacher().getTsex()==0}">女</td>
+
+                <td><a th:href="@{/students/course}">进入</a><br><a th:href="@{/students/grade}">成绩</a></td>
+              </tr>
+
+            </table>
           </div>
           <style type="text/css">
             tr.font {

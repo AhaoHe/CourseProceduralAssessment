@@ -89,22 +89,42 @@
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
+              <a class="no-margin-bottom" th:href="@{/teacherMain}">返回</a>
             </div>
           </header>
+
           <br>
+
           <div >
-            <h1 class="h4" align="center">所管理课程</h1>
             <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>课程编号</td><td>课程名称</td><td>操作</td></tr>
-              <tr th:each="c:${courses}">
-                <td th:text="${c.getCid()}"></td>
-                <td th:text="${c.getCourse()}"></td>
-                <td><a th:href="@{/teachers/course}">课程管理</a>
-                    <a th:href="@{/teachers/course_students/{cid}(cid=${c.getCid()})}">学生管理</a>
+              <tr class="font"><td>学号</td><td>学生姓名</td><td>学生班级</td><td>性别</td><td>操作</td></tr>
+              <tr th:each="a:${cs}">
+                  <td th:text="${a.getStudent().getId()}"></td>
+                  <td th:text="${a.getStudent().getSname()}"></td>
+                  <td th:text="${a.getStudent().getSclass()}"></td>
+                  <!-- 判断男女 -->
+                  <td th:if="${a.getStudent().getSsex()==1}">男</td>
+                  <td th:if="${a.getStudent().getSsex()==0}">女</td>
+                <td>
+                  <a th:if="${a.getIfjoin()}==2" th:href="@{/teachers/deleteStu/{id}/{cid}(id=${a.getStudent().getId()},cid=${a.getCourse().getCid()})}" style="color: red">申请删除</a>
+                  <a th:if="${a.getIfjoin()}==3" th:href="@{/teachers/allowStu/{Cid}/{Sid}/{x}
+                    (Cid=${a.getCourse().getCid()},Sid=${a.getStudent().getId()},x=2)}" style="color: green">撤销删除</a>
                 </td>
               </tr>
             </table>
+            <div style="text-align: center">
+              <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->
+              <div th:if="${page.pageNum - 1 > 0}" style="display: inline-block;">
+                <a th:href="@{'?start='+${page.pageNum - 1}}" >[上一页]</a>
+              </div>
+              <div th:if="${page.pageNum +1 < page.pages +1}" style="display: inline-block;">
+                <a th:href="@{'?start='+${page.pageNum + 1}}" >[下一页]</a>
+              </div>
+              <a th:href="@{'?start='+${page.pages}}" style="display: inline-block;">[末  页]</a>
+            </div>
+            <div align="center">
+              当前页/总页数：<a href="?start=${page.pageNum}" th:text="${page.pageNum}"></a>/<a href="?start=${page.pages}" th:text="${page.pages}"></a>
+            </div>
           </div>
           <style type="text/css">
             button  {

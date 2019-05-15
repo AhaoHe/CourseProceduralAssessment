@@ -42,20 +42,21 @@ class WebMvcConfig implements WebMvcConfigurer {
                         "/student/login","/teacher/login","/admin/login");
 
         //拦截非学生用户
-        registry.addInterceptor(new StudentLoginHandlerInterceptor()).addPathPatterns("/studentMain");
+        registry.addInterceptor(new StudentLoginHandlerInterceptor()).addPathPatterns("/students/**","/studentMain");
 
         //拦截非教师用户
-        registry.addInterceptor(new TeacherLoginHandlerInterceptor()).addPathPatterns("/teacherMain");
+        registry.addInterceptor(new TeacherLoginHandlerInterceptor()).addPathPatterns("/teachers/**","/teacherMain");
 
         //拦截非管理员用户
-        registry.addInterceptor(new AdminLoginHandlerInterceptor()).addPathPatterns("/adminMain");
+        registry.addInterceptor(new AdminLoginHandlerInterceptor()).addPathPatterns("/adminMain","/Admin/**");
 
     }
 
+
+
     @Override
+    //使用其他链接访问页面
     public void addViewControllers(ViewControllerRegistry registry) {
-        //学生界面
-        registry.addViewController("/studentMain").setViewName("stumanag");
         //学生登录界面
         registry.addViewController("/studentLogin").setViewName("studentlogin");
         //主页
@@ -63,13 +64,10 @@ class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/index.html").setViewName("index");
         //教师登录界面
         registry.addViewController("/teacherLogin").setViewName("teacherlogin");
-        //教师管理界面
-        registry.addViewController("/teacherMain").setViewName("teachermanag");
-        //管理员管理界面
-        registry.addViewController("/adminMain").setViewName("manag");
         //管理员登录界面
         registry.addViewController("/adminLogin").setViewName("managementlogin");
-
+        //成绩表
+        registry.addViewController("/students/grade").setViewName("students/grade");
     }
 
 }

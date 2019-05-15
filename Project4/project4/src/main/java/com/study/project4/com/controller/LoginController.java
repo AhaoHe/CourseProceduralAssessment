@@ -37,7 +37,7 @@ public class LoginController {
 
     //学生登录
     @PostMapping("/student/login")
-    public String Studentlogin(@RequestParam("stuname") int stuname,
+    public String Studentlogin(@RequestParam("stuname") Integer stuname,
                                @RequestParam("spsw") String spsw,
                                @RequestParam("validatecode") String validatecode,
                                Map<String,Object> map, HttpSession session){
@@ -59,7 +59,7 @@ public class LoginController {
             return "studentlogin";
         }
 
-        if (loginStu!=null) {//判断用户是否存在，防止出现密码不存在而报错505
+        if (loginStu!=null) {//判断用户是否存在，防止出现用户不存在而报错505
             String password = stu.getStuByid(stuname).getSpsw();
             if (!StringUtils.isEmpty(stuname) && password.equals(spsw)) {
                 //登录成功，防止表单重复提交，重定向到学生后台
@@ -68,12 +68,12 @@ public class LoginController {
                 session.setAttribute("Main",loginStu);
                 return "redirect:/";
             } else {
-                //登录失败
+                //登录失败，返回登录页面
                 map.put("msg", "用户名/密码错误");
-                return "studentlogin";
+                return "studentlogin";//这是登录页面的地址
             }
         }else {
-            //登录失败
+            //登录失败，返回登录页面
             map.put("msg", "用户名不存在");
             return "studentlogin";
         }
@@ -107,6 +107,7 @@ public class LoginController {
                 //登录成功，防止表单重复提交，重定向到学生后台
                 session.setAttribute("loginUser",tname);
                 session.setAttribute("User","teacher");
+                session.setAttribute("Main",loginTeacher);
                 return "redirect:/";
             } else {
                 //登录失败
@@ -148,6 +149,7 @@ public class LoginController {
                 //登录成功，防止表单重复提交，重定向到管理员后台
                 session.setAttribute("loginUser",aname);
                 session.setAttribute("User","admin");
+                session.setAttribute("Main",loginAdmin);
                 return "redirect:/";
             } else {
                 //登录失败

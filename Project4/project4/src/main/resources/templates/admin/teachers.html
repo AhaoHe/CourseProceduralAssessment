@@ -72,16 +72,18 @@
         <nav class="side-navbar">
           <!-- Sidebar Header-->
           <div class="sidebar-header d-flex align-items-center">
+
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
-              <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
-              <p>老师编号：<p th:text="${session.loginUser}"></p></p>
+              <h1 class="h4" th:text="${session.Main.getId()}"></h1>
+              <p>管理员编号:<p th:text="${session.loginUser}"></p></p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a th:href="@{/teacherMain}"> </i>我的信息 </a></li>
-                    <li><a th:href="@{/teachers/AllCourse}"></i>课程申请管理 </a></li>
+                    <li ><a th:href="@{/adminMain}"> </i>课程管理 </a></li>
+                    <li><a th:href="@{/Admin/students}"></i>学生管理 </a></li>
+                    <li class="active"><a th:href="@{/Admin/teachers}"></i>教师管理 </a></li>
                     <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
           </ul>
         </nav>
@@ -92,17 +94,20 @@
               <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
             </div>
           </header>
+          <!-- Dashboard Header Section    -->
           <br>
           <div >
-            <h1 class="h4" align="center">所管理课程</h1>
             <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>课程编号</td><td>课程名称</td><td>操作</td></tr>
-              <tr th:each="c:${courses}">
-                <td th:text="${c.getCid()}"></td>
-                <td th:text="${c.getCourse()}"></td>
-                <td><a th:href="@{/teachers/course}">课程管理</a>
-                    <a th:href="@{/teachers/course_students/{cid}(cid=${c.getCid()})}">学生管理</a>
-                </td>
+              <tr class="font"><td>老师编号</td><td>老师姓名</td><td>性别</td><td>操作</td></tr>
+              <tr th:each="t:${teachers}">
+                <td th:text="${t.getTid()}"></td>
+                <td th:text="${t.getTname()}"></td>
+
+                <!-- 判断男女 -->
+                <td th:if="${t.getTsex()==1}">男</td>
+                <td th:if="${t.getTsex()==0}">女</td>
+
+                <td><a th:href="@{/Admin/deleteT/{id}(id=${t.getTid()})}">删除</a></td>
               </tr>
             </table>
           </div>
