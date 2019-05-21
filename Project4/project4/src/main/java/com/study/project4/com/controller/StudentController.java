@@ -3,13 +3,15 @@ package com.study.project4.com.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.study.project4.com.entity.Course;
+import com.study.project4.com.entity.Course_Students;
 import com.study.project4.com.service.CourseService;
+import com.study.project4.com.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -19,6 +21,8 @@ public class StudentController {
 
     @Autowired
     CourseService courseService=new CourseService();
+    @Autowired
+    StudentService studentService=new StudentService();
 
     @RequestMapping("/studentMain")
     public String StudentMain(HttpSession session, Model model){
@@ -65,5 +69,36 @@ public class StudentController {
         int id= (int) stuId;
         courseService.addIfjoin(Cid,id,1);
         return "redirect:/students/AllCourse";
+    }
+
+
+    //查询成绩
+    @RequestMapping("/teachers/StuScores/{id}/{cid}")
+    public String getStuScoresByCidAndId(@PathVariable("cid") Integer cid,
+                             @PathVariable("id") Integer id,
+                             Model model){
+        //查询章节数
+        Course course=courseService.getCourseByCid(cid);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+        model.addAttribute("chapters",c);
+
+        //查询成绩
+        Course_Students cs=studentService.getScores(cid,id);
+        String scores=cs.getScores();
+        String[] s=scores.split("\\|\\|");
+        model.addAttribute("scores",s);
+
+        //平均成绩
+        int sum=0;
+        for (String value : s) {
+            int x = Integer.parseInt(value);
+            sum+=x;
+        }
+        int aver=sum/s.length;
+        model.addAttribute("aver",aver);
+
+        return "teachers/course_students";
+
     }
 }

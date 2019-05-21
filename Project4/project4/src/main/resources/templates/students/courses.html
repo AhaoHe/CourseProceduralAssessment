@@ -75,7 +75,8 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getSname()}"></h1>
-              <p>学号:<p th:text="${session.loginUser}"></p></p>
+              <p>学号:[[${session.loginUser}]]</p>
+              <p>班级:[[${session.Main.getClassName().getClassname()}]]</p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>

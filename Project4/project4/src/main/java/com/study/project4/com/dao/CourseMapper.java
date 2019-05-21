@@ -36,7 +36,7 @@ public interface CourseMapper {
     public List<Course> getCoursesAll();
 
 
-    //查看每门课申请的情况，ifjoin=2已经添加课程，=1表示正在申请，=0表示未申请,4表示申请删除
+    //查看每门课申请的情况，ifjoin=2已经添加课程，=1表示正在申请，=0表示未申请,3表示申请删除
     @Select("SELECT c.*,cs.ifjoin ifjoin " +
             "FROM course c,course_students cs " +
             "WHERE cs.id=#{id} AND cs.cid=c.cid " +
@@ -57,7 +57,8 @@ public interface CourseMapper {
     //查询某门课有哪些学生
     @Select("SELECT s.*,c.cid,cs.ifjoin " +
             "FROM course c,course_students cs,student s " +
-            "WHERE cs.ifjoin IN (2,3) AND cs.cid=c.cid AND s.id=cs.id AND cs.cid=#{cid}")
+            "WHERE cs.ifjoin IN (2,3) AND cs.cid=c.cid AND s.id=cs.id AND cs.cid=#{cid} " +
+            "ORDER By s.id asc")
     @Results({
             @Result(column = "id", property = "student",javaType = Student.class,
                     one = @One(select = "com.study.project4.com.dao.StudentsMapper.getStuByid")),
@@ -65,5 +66,17 @@ public interface CourseMapper {
                     one = @One(select = "com.study.project4.com.dao.CourseMapper.getCourseByCid"))
     })
     public List<Course_Students> COURSE_STUDENTS(Integer cid);
+
+    //修改或者删除章节
+    @Update("UPDATE course SET chapters=#{chapters} WHERE cid=#{cid}")
+    public int UpdateandDelChapters(@Param("chapters") String chapters,
+                                       @Param("cid") int cid);
+
+    //修改或者删除成绩
+    @Update("UPDATE course_students SET scores=#{scores} WHERE cid=#{cid} AND id=#{id}")
+    public int UpdateandDelScores(@Param("scores") String scores,
+                                  @Param("cid") int cid,
+                                  @Param("id") int id);
+
 
 }

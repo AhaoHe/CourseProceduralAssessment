@@ -84,6 +84,7 @@
                     <li class="active"><a th:href="@{/adminMain}"> </i>课程管理 </a></li>
                     <li><a th:href="@{/Admin/students}"></i>学生管理 </a></li>
                     <li><a th:href="@{/Admin/teachers}"></i>教师管理 </a></li>
+                    <li><a th:href="@{/Admin/classname}"></i>班级管理 </a></li>
                     <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
           </ul>
         </nav>
@@ -91,17 +92,21 @@
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
+              <button type="button" class="btn btn-info"
+                      data-toggle="modal" data-target="#addModal">添加课程</button>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
 
           <br>
 
-          <div >
-            <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>课程编号</td><td>课程名称</td><td>老师名称</td><td>性别</td><td>操作</td></tr>
-              <tr th:each="c:${courses}">
+          <div class="container">
+            <table id="table" class="table table-hover table-bordered" border="1" align="center">
+              <thead>
+                <tr class="font"><td>课程编号</td><td>课程名称</td><td>老师名称</td><td>性别</td><td>操作</td></tr>
+              </thead>
+              <tbody>
+              <tr th:each="c,cState:${courses}">
                 <td th:text="${c.getCid()}"></td>
                 <td th:text="${c.getCourse()}"></td>
                 <td th:text="${c.getTeacher().getTname()}"></td>
@@ -110,12 +115,150 @@
                 <td th:if="${c.getTeacher().getTsex()==1}">男</td>
                 <td th:if="${c.getTeacher().getTsex()==0}">女</td>
 
-                <td><a th:href="@{/Admin/deleteC/{id}(id=${c.getCid()})}">删除</a>
-                  <a th:href="@{/Admin/TeaDelStu/{cid}(cid=${c.getCid()})}">课程管理</a>
+                <td><a th:href="@{/Admin/deleteC/{id}(id=${c.getCid()})}" class="btn btn-danger">删除</a>
+                  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal" th:id="${cState.index+1}"
+                  onclick="editInfo(this)">编辑</button>
+                  <a th:href="@{/Admin/TeaDelStu/{cid}(cid=${c.getCid()})}" class="btn btn-info">课程管理</a>
                 </td>
+
               </tr>
+              </tbody>
             </table>
           </div>
+
+
+
+
+
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">
+                    课程信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/Admin/updateC}" method="post">
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="course" class="col-sm-3 control-label">课程ID</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="cid" name="cid" readonly="true">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="course" class="col-sm-3 control-label">课程名字</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="course" name="course" placeholder="请输入课程名字">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="tid" class="col-sm-3 control-label">授课老师</label>
+                      <div class="col-sm-9">
+                        <select class="selectpicker" id="tid" name="tid">
+                          <option th:each="t:${teachers}" th:value="${t.getTid()}" th:text="${t.getTname()}" ></option>
+                        </select>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
+
+          <script>
+              // 编辑课程
+              function editInfo(obj) {
+                  var id=$(obj).attr("id");
+                  var cid=document.getElementById("table").rows[id].cells[0].innerText;
+                  var cname = document.getElementById("table").rows[id].cells[1].innerText;
+                  var tname = document.getElementById("table").rows[id].cells[2].innerText;
+                  var tid=document.getElementById("tid");
+
+                  $('#cid').val(cid);
+                  $('#course').val(cname);
+                  for (var i=0;i<tid.length;i++){
+                      if (tid.options[i].text==tname){
+                          tid.options[i].selected = true;
+                      }
+                  }
+
+              }
+          </script>
+
+
+          <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="addModalLabel">
+                    课程信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/Admin/addCourse}" method="post">
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="course" class="col-sm-3 control-label">课程名字</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="addcourse" name="addcourse" placeholder="请输入课程名字">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="tid" class="col-sm-3 control-label">授课老师</label>
+                      <div class="col-sm-9">
+                        <select class="selectpicker" id="addtid" name="addtid">
+                          <option th:each="t:${teachers}" th:value="${t.getTid()}" th:text="${t.getTname()}" ></option>
+                        </select>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+                </div>
+
+                <!-- /.modal-content -->
+
+              </div>
+
+                <!-- /.modal -->
+          </div>
+
+
           <style type="text/css">
             button  {
               background:#b5cfd2 url('css/bulecell.jpg');

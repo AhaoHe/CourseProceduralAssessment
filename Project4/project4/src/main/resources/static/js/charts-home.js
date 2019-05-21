@@ -1,4 +1,5 @@
 /*global $, document, Chart, LINECHART, data, options, window*/
+
 $(document).ready(function () {
 
     'use strict';
@@ -10,6 +11,7 @@ $(document).ready(function () {
     if ($(window).outerWidth() < 576) {
         legendState = false;
     }
+
 
     var LINECHART = $('#lineCahrt');
     var myLineChart = new Chart(LINECHART, {
@@ -34,7 +36,7 @@ $(document).ready(function () {
             }
         },
         data: {
-            labels: ["第一章", "第二章", "第三章", "第四章", "第五章", "第六章"],
+            labels: chapter,
             datasets: [
                 {
                     label: "你的分数",
@@ -56,7 +58,7 @@ $(document).ready(function () {
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 0,
-                    data: [80, 84, 70, 69, 90, 84],
+                    data: score,
                     spanGaps: false
                 },
                 {

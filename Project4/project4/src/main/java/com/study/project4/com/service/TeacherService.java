@@ -24,16 +24,7 @@ public class TeacherService {
     public Teacher getTeaByid(Integer id){
         return  teacherMapper.getTeaByID(id);
     }
-    //添加老师
-    public Teacher addTea(Teacher teacher){
-        teacherMapper.addTeacher(teacher);
-        return teacher;
-    }
-    //修改老师信息
-    public Teacher updateTeahcer(Teacher teacher){
-        teacherMapper.updateTeacher(teacher);
-        return teacher;
-    }
+
 
     //根据老师ID查询上那些课
     public List<Course> findCourseByTid(Integer tid){

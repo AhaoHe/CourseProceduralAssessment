@@ -4,7 +4,7 @@ public class Student {
     int id;
     String sname;
     String spsw;
-    String sclass;
+    ClassName className;
     int ssex;
 
     public int getSsex() {
@@ -31,12 +31,12 @@ public class Student {
         this.sname = sname;
     }
 
-    public String getSclass() {
-        return sclass;
+    public ClassName getClassName() {
+        return className;
     }
 
-    public void setSclass(String sclass) {
-        this.sclass = sclass;
+    public void setClassName(ClassName className) {
+        this.className = className;
     }
 
     public String getSpsw() {

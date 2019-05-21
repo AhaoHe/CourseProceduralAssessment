@@ -4,6 +4,15 @@ public class Course_Students {
     Course course;
     Student student;
     int ifjoin;
+    String scores;
+
+    public String getScores() {
+        return scores;
+    }
+
+    public void setScores(String scores) {
+        this.scores = scores;
+    }
 
     public int getIfjoin() {
         return ifjoin;

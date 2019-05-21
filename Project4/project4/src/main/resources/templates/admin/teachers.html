@@ -84,6 +84,7 @@
                     <li ><a th:href="@{/adminMain}"> </i>课程管理 </a></li>
                     <li><a th:href="@{/Admin/students}"></i>学生管理 </a></li>
                     <li class="active"><a th:href="@{/Admin/teachers}"></i>教师管理 </a></li>
+                    <li><a th:href="@{/Admin/classname}"></i>班级管理 </a></li>
                     <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
           </ul>
         </nav>
@@ -91,30 +92,186 @@
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
+              <button type="button" class="btn btn-info"
+                      data-toggle="modal" data-target="#addModal">添加教师</button>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
           <br>
           <div >
-            <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>老师编号</td><td>老师姓名</td><td>性别</td><td>操作</td></tr>
-              <tr th:each="t:${teachers}">
+            <table id="table" class="table table-hover table-bordered" border="1"align="center">
+              <thead><tr class="font"><td>老师编号</td><td>老师姓名</td><td>性别</td><td>操作</td></tr></thead>
+              <tbody>
+              <tr th:each="t,tState:${teachers}">
                 <td th:text="${t.getTid()}"></td>
                 <td th:text="${t.getTname()}"></td>
 
                 <!-- 判断男女 -->
                 <td th:if="${t.getTsex()==1}">男</td>
                 <td th:if="${t.getTsex()==0}">女</td>
-
-                <td><a th:href="@{/Admin/deleteT/{id}(id=${t.getTid()})}">删除</a></td>
+                
+                <td>
+                  <a th:href="@{/Admin/deleteT/{id}(id=${t.getTid()})}" class="btn btn-danger">删除</a>
+                  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal"
+                          onclick="editInfo(this)" th:id="${tState.index+1}">编辑</button>
+                </td>
               </tr>
+              </tbody>
             </table>
           </div>
+
+
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">
+                    教师信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/Admin/updateT}" method="post">
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="teacherId" class="col-sm-3 control-label">老师ID</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="teacherId" name="teacherId" readonly="true">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="tpswd" class="col-sm-3 control-label">教师密码</label>
+                      <div class="col-sm-9">
+                        <input type="password" class="form-control" id="tpswd" name="tpswd" placeholder="请输入密码">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="tname" class="col-sm-3 control-label">老师名字</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="tname" name="tname" placeholder="请输入老师名字">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="man" class="col-sm-3 control-label">性别</label>
+                      <div class="col-sm-9">
+                        <input type="radio" name="tsex" class="sex" id="man" value="1" />&nbsp;男&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="tsex" class="sex" id="women" value="0" />&nbsp;女
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
+
+          <script language='javascript' th:inline="javascript">
+              // 编辑课程
+              function editInfo(obj) {
+                  var id=$(obj).attr("id");
+                  var tid=document.getElementById("table").rows[id].cells[0].innerText;
+                  var tname = document.getElementById("table").rows[id].cells[1].innerText;
+                  var tsex = document.getElementById("table").rows[id].cells[2].innerText;
+
+
+                  $('#teacherId').val(tid);
+                  $('#tname').val(tname);
+                  if (tsex == '女') {
+                      document.getElementById('women').checked = true;
+                  } else {
+                      document.getElementById('man').checked = true;
+                  }
+
+                  $.each([[${teachers}]][id-1],function(key,value){
+                      if(key=="tpsw") {
+                          var tpswd=value;
+                          $('#tpswd').val(tpswd);
+                      }
+                  });
+
+              }
+          </script>
+
+
+          <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="addModalLabel">
+                    教师信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/Admin/addTeacher}" method="post">
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <label for="addtname" class="col-sm-3 control-label">教师名字</label>
+                      <div class="col-sm-9">
+                        <input type="text" class="form-control" id="addtname" name="addtname" placeholder="请输入教师名字">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="addtpswd" class="col-sm-3 control-label">教师密码</label>
+                      <div class="col-sm-9">
+                        <input type="password" class="form-control" id="addtpswd" name="addtpswd" placeholder="请输入密码(不填写默认为123456)">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="addman" class="col-sm-3 control-label">性别</label>
+                      <div class="col-sm-9">
+                        <input type="radio" name="addtsex" class="sex" id="addman" value="1" />&nbsp;男&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="addtsex" class="sex" id="addwomen" value="0" />&nbsp;女
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
+
           <style type="text/css">
-            button  {
-              background:#b5cfd2 url('css/bulecell.jpg');
-            }
+
             tr.font {
               font-size: 20px;
             }

@@ -72,19 +72,16 @@
         <nav class="side-navbar">
           <!-- Sidebar Header-->
           <div class="sidebar-header d-flex align-items-center">
-
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
-              <h1 class="h4" th:text="${session.Main.getId()}"></h1>
-              <p>管理员编号:<p th:text="${session.loginUser}"></p></p>
+              <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
+              <p>老师编号：[[${session.loginUser}]]</p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li ><a th:href="@{/adminMain}"> </i>课程管理 </a></li>
-                    <li class="active"><a th:href="@{/Admin/students}"></i>学生管理 </a></li>
-                    <li><a th:href="@{/Admin/teachers}"></i>教师管理 </a></li>
-                    <li><a th:href="@{/Admin/classname}"></i>班级管理 </a></li>
+                    <li class="active"><a th:href="@{/teacherMain}"> </i>我的信息 </a></li>
+                    <li><a th:href="@{/teachers/AllCourse}"></i>课程申请管理 </a></li>
                     <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
           </ul>
         </nav>
@@ -92,89 +89,60 @@
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <button type="button" class="btn btn-info"
-                      data-toggle="modal" data-target="#addModal">添加学生</button>
+              <a class="no-margin-bottom" style="margin-right: 80%;" th:href="@{/teacherMain}">返回</a>
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addModal">添加章节</button>
             </div>
           </header>
-          <!-- Dashboard Header Section    -->
+
           <br>
+
           <div >
-            <table id="table" class="table table-hover table-bordered" border="1"align="center">
-             <thead>
-              <tr class="font"><td>学号</td><td>学生姓名</td><td>性别</td><td>班级</td><td>操作</td></tr>
-             </thead>
-             <tbody>
-              <tr th:each="s,sState:${students}">
-                <td th:text="${s.getId()}"></td>
-                <td th:text="${s.getSname()}"></td>
+            <table id="table" class="table table-hover table-bordered" border="1" align="center">
+              <thead><tr class="font"><td>章节序列</td><td>章节名称</td><td>操作</td></tr></thead>
+              <tbody>
+              <tr th:each="c,cStat:${chapters}">
 
-                <!-- 判断男女 -->
-                <td th:if="${s.getSsex()==1}">男</td>
-                <td th:if="${s.getSsex()==0}">女</td>
+                <td th:if="${c.toString()!=''}" th:text="${cStat.count}"></td>
 
-                <td th:text="${s.getClassName().getClassname()}"></td>
-                <td>
-                  <a th:href="@{/Admin/deleteS/{id}(id=${s.getId()})}" class="btn btn-danger">删除</a>
-                  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal"
-                          onclick="editInfo(this)" th:id="${sState.index+1}">编辑</button>
+                <td th:if="${c.toString()!=''}" th:text="${c.toString()}"></td>
+
+                <td th:if="${c.toString()!=''}">
+                  <a class="btn btn-danger" th:href="@{/teachers/deleteChapter/{cid}/{id}
+                     (cid=${courseID},id=${cStat.index})}">删除</a>
+                  <button th:id="${cStat.index+1}" onclick="editInfo(this)"
+                     class="btn btn-info" data-toggle="modal" data-target="#editModal">修改</button>
                 </td>
               </tr>
-             </tbody>
+              </tbody>
             </table>
+
           </div>
 
 
 
 
-          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <!--修改章节-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
 
                 <div class="modal-header">
-                  <h4 class="modal-title" id="myModalLabel">
-                    学生信息
+                  <h4 class="modal-title" id="editModalLabel">
+                    课程信息
                   </h4>
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     ×
                   </button>
                 </div>
-                <form th:action="@{/Admin/updateStu}" method="post">
+                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
                   <div class="modal-body">
-                    <div class="form-group">
-                      <label for="StuId" class="col-sm-3 control-label">学生ID</label>
-                      <div class="col-sm-9">
-                        <input type="text" class="form-control" id="StuId" name="StuId" readonly="true">
-                      </div>
-                    </div>
+
+                    <input style="display: none" id="chapterId" name="chapterId">
 
                     <div class="form-group">
-                      <label for="spswd" class="col-sm-3 control-label">学生密码</label>
+                      <label for="chapterName" class="col-sm-3 control-label">章节名字</label>
                       <div class="col-sm-9">
-                        <input type="password" class="form-control" id="spswd" name="spswd" placeholder="请输入密码">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="sname" class="col-sm-3 control-label">学生名字</label>
-                      <div class="col-sm-9">
-                        <input type="text" class="form-control" id="sname" name="sname" placeholder="请输入学生名字">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="classid" class="col-sm-3 control-label">班级</label>
-                      <div class="col-sm-9">
-                        <select class="selectpicker" id="classid" name="classid">
-                          <option th:each="cn:${classNames}" th:value="${cn.getClassid()}" th:text="${cn.getClassname()}" ></option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="man" class="col-sm-3 control-label">性别</label>
-                      <div class="col-sm-9">
-                        <input type="radio" name="ssex" class="sex" id="man" value="1" />&nbsp;男&nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="ssex" class="sex" id="women" value="0" />&nbsp;女
+                        <input type="text" class="form-control" id="cName" name="chapterName" placeholder="请输入章节名字">
                       </div>
                     </div>
 
@@ -197,88 +165,47 @@
             <!-- /.modal -->
           </div>
 
-
-
-          <script language='javascript' th:inline="javascript">
-              // 编辑课程
+          <script>
+              // 编辑章节
               function editInfo(obj) {
                   var id=$(obj).attr("id");
-                  var sid=document.getElementById("table").rows[id].cells[0].innerText;
-                  var sname = document.getElementById("table").rows[id].cells[1].innerText;
-                  var ssex = document.getElementById("table").rows[id].cells[2].innerText;
-                  var sclass = document.getElementById("table").rows[id].cells[3].innerText;
-                  var classname=document.getElementById("classid");
+                  var cname=document.getElementById("table").rows[id].cells[1].innerText;
 
-                  $.each([[${students}]][id-1],function(key,value){
-                      if(key=="spsw") {
-                          var spswd=value;
-                          $('#spswd').val(spswd);
-                      }
-                  });
-
-
-                  $('#StuId').val(sid);
-                  $('#sname').val(sname);
-
-                  for (var i=0;i<classname.length;i++){
-                      if (classname.options[i].text==sclass){
-                          classname.options[i].selected = true;
-                      }
-                  }
-
-                  if (ssex == '女') {
-                      document.getElementById('women').checked = true;
-                  } else {
-                      document.getElementById('man').checked = true;
-                  }
+                  $('#cName').val(cname);
+                  $('#chapterId').val(id-1);
 
               }
           </script>
 
 
+
+          <!--添加章节-->
           <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
 
                 <div class="modal-header">
                   <h4 class="modal-title" id="addModalLabel">
-                    学生信息
+                    课程信息
                   </h4>
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     ×
                   </button>
                 </div>
-                <form th:action="@{/Admin/addStudent}" method="post">
+                <form th:action="@{/teachers/addChapters/{cid}(cid=${courseID})}" method="post">
                   <div class="modal-body">
 
                     <div class="form-group">
-                      <label for="addspswd" class="col-sm-3 control-label">学生密码</label>
+                      <label for="chapterName" class="col-sm-3 control-label">章节名字</label>
                       <div class="col-sm-9">
-                        <input type="password" class="form-control" id="addspswd" name="spswd" placeholder="请输入密码（不填写，默认为123456）">
+                        <input type="text" class="form-control" id="chapterName" name="chapterName" placeholder="请输入章节名字">
                       </div>
                     </div>
 
                     <div class="form-group">
-                      <label for="addsname" class="col-sm-3 control-label">学生名字</label>
+                      <label for="chapterName" class="col-sm-3 control-label">初始成绩</label>
                       <div class="col-sm-9">
-                        <input type="text" class="form-control" id="addsname" name="sname" placeholder="请输入学生名字">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="addclassid" class="col-sm-3 control-label">班级</label>
-                      <div class="col-sm-9">
-                        <select class="selectpicker" id="addclassid" name="classid">
-                          <option th:each="cn:${classNames}" th:value="${cn.getClassid()}" th:text="${cn.getClassname()}" ></option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="addman" class="col-sm-3 control-label">性别</label>
-                      <div class="col-sm-9">
-                        <input type="radio" name="ssex" class="sex" id="addman" value="1" />&nbsp;男&nbsp;&nbsp;&nbsp;
-                        <input type="radio" name="ssex" class="sex" id="addwomen" value="0" />&nbsp;女
+                        <input type="text" class="form-control" id="scores" name="scores" placeholder="请输入初始成绩">
                       </div>
                     </div>
 
@@ -300,9 +227,6 @@
 
             <!-- /.modal -->
           </div>
-
-
-
 
 
           <style type="text/css">

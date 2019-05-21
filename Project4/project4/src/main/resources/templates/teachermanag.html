@@ -100,7 +100,7 @@
               <tr th:each="c:${courses}">
                 <td th:text="${c.getCid()}"></td>
                 <td th:text="${c.getCourse()}"></td>
-                <td><a th:href="@{/teachers/course}">课程管理</a>
+                <td><a th:href="@{/teachers/course/{cid}(cid=${c.getCid()})}">课程管理</a>
                     <a th:href="@{/teachers/course_students/{cid}(cid=${c.getCid()})}">学生管理</a>
                 </td>
               </tr>
@@ -108,7 +108,7 @@
           </div>
           <style type="text/css">
             button  {
-              background:#b5cfd2 url('css/bulecell.jpg');
+              background:#b5cfd2 url('static/css/bulecell.jpg');
             }
             tr.font {
               font-size: 20px;

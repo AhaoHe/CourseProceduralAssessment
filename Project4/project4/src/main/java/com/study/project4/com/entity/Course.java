@@ -6,6 +6,15 @@ public class Course {
     String course;
     int ifjoin;
     Teacher teacher;
+    String chapters;
+
+    public String getChapters() {
+        return chapters;
+    }
+
+    public void setChapters(String chapters) {
+        this.chapters = chapters;
+    }
 
     public int getIfjoin() {
         return ifjoin;

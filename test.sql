@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50721
 File Encoding         : 65001
 
-Date: 2019-05-15 22:19:49
+Date: 2019-05-21 17:59:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -31,13 +31,35 @@ CREATE TABLE `admin` (
 INSERT INTO `admin` VALUES ('2019', '123456');
 
 -- ----------------------------
+-- Table structure for classname
+-- ----------------------------
+DROP TABLE IF EXISTS `classname`;
+CREATE TABLE `classname` (
+  `classid` int(11) NOT NULL AUTO_INCREMENT,
+  `classname` varchar(255) NOT NULL,
+  PRIMARY KEY (`classid`),
+  KEY `classname` (`classname`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of classname
+-- ----------------------------
+INSERT INTO `classname` VALUES ('9', '工程');
+INSERT INTO `classname` VALUES ('1', '应用1');
+INSERT INTO `classname` VALUES ('2', '应用2');
+INSERT INTO `classname` VALUES ('3', '应用3');
+INSERT INTO `classname` VALUES ('4', '应用4');
+INSERT INTO `classname` VALUES ('5', '应用5');
+
+-- ----------------------------
 -- Table structure for course
 -- ----------------------------
 DROP TABLE IF EXISTS `course`;
 CREATE TABLE `course` (
   `cid` int(11) NOT NULL AUTO_INCREMENT,
-  `course` varchar(255) DEFAULT NULL,
-  `tid` int(11) DEFAULT NULL,
+  `course` varchar(255) NOT NULL,
+  `tid` int(11) NOT NULL,
+  `chapters` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`cid`),
   KEY `tid` (`tid`),
   CONSTRAINT `ct` FOREIGN KEY (`tid`) REFERENCES `teacher` (`tid`)
@@ -46,12 +68,12 @@ CREATE TABLE `course` (
 -- ----------------------------
 -- Records of course
 -- ----------------------------
-INSERT INTO `course` VALUES ('1', 'JavaEE', '1');
-INSERT INTO `course` VALUES ('2', '工程实践4', '2');
-INSERT INTO `course` VALUES ('3', 'C语言', '1');
-INSERT INTO `course` VALUES ('4', '大学英语', '3');
-INSERT INTO `course` VALUES ('5', 'Java高级编程', '2');
-INSERT INTO `course` VALUES ('6', '计算机网络', '1');
+INSERT INTO `course` VALUES ('1', 'JavaE', '1', '第1章||第2章');
+INSERT INTO `course` VALUES ('2', '工程实践4', '2', '');
+INSERT INTO `course` VALUES ('3', 'C语言', '1', '');
+INSERT INTO `course` VALUES ('4', '大学英语', '3', '');
+INSERT INTO `course` VALUES ('5', 'Java高级编程', '2', '');
+INSERT INTO `course` VALUES ('6', '计算机网络', '1', '');
 
 -- ----------------------------
 -- Table structure for course_students
@@ -59,8 +81,9 @@ INSERT INTO `course` VALUES ('6', '计算机网络', '1');
 DROP TABLE IF EXISTS `course_students`;
 CREATE TABLE `course_students` (
   `cid` int(11) NOT NULL,
-  `id` int(11) NOT NULL,
+  `id` bigint(100) NOT NULL,
   `ifjoin` int(11) NOT NULL,
+  `scores` varchar(255) DEFAULT '',
   KEY `course_courses` (`cid`),
   KEY `c_students` (`id`),
   CONSTRAINT `c_students` FOREIGN KEY (`id`) REFERENCES `student` (`id`),
@@ -70,25 +93,29 @@ CREATE TABLE `course_students` (
 -- ----------------------------
 -- Records of course_students
 -- ----------------------------
-INSERT INTO `course_students` VALUES ('1', '2016051101', '2');
+INSERT INTO `course_students` VALUES ('1', '2016051101', '2', '90||90');
+INSERT INTO `course_students` VALUES ('1', '2016051100', '2', '90||90');
+INSERT INTO `course_students` VALUES ('2', '2016051100', '1', '');
 
 -- ----------------------------
 -- Table structure for student
 -- ----------------------------
 DROP TABLE IF EXISTS `student`;
 CREATE TABLE `student` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(100) NOT NULL AUTO_INCREMENT,
   `sname` varchar(255) NOT NULL,
   `spsw` varchar(255) NOT NULL,
-  `sclass` varchar(255) NOT NULL,
+  `classid` int(11) NOT NULL,
   `ssex` int(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2016051104 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `sclass` (`classid`),
+  CONSTRAINT `classid_classname` FOREIGN KEY (`classid`) REFERENCES `classname` (`classid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2016051103 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of student
 -- ----------------------------
-INSERT INTO `student` VALUES ('2016051100', '阿豪', '123456', '3', '1');
+INSERT INTO `student` VALUES ('2016051100', '阿豪', '123456', '2', '1');
 INSERT INTO `student` VALUES ('2016051101', '阿浩', '123456', '4', '1');
 INSERT INTO `student` VALUES ('2016051102', '阿祥', '123456', '3', '0');
 
@@ -102,7 +129,7 @@ CREATE TABLE `teacher` (
   `tpsw` varchar(255) NOT NULL,
   `tsex` int(1) NOT NULL,
   PRIMARY KEY (`tid`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of teacher

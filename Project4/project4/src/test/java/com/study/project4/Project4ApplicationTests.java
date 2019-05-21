@@ -2,20 +2,22 @@ package com.study.project4;
 
 import com.study.project4.com.entity.Course;
 import com.study.project4.com.entity.Course_Students;
+import com.study.project4.com.entity.Teacher;
+import com.study.project4.com.service.AdminService;
 import com.study.project4.com.service.CourseService;
 import com.study.project4.com.service.StudentService;
 import com.study.project4.com.service.TeacherService;
+import com.sun.deploy.util.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -30,6 +32,8 @@ public class Project4ApplicationTests {
     CourseService courseService=new CourseService();
     @Autowired
     TeacherService teacherService=new TeacherService();
+    @Autowired
+    AdminService adminService=new AdminService();
 
     @Test
     public void contextLoads() throws SQLException {
@@ -118,4 +122,101 @@ public class Project4ApplicationTests {
             System.out.println(a.getIfjoin());
         }
     }
+
+    //修改课程信息
+    @Test
+    public void UpdateCourse(){
+        Course c = new Course();
+        Teacher teacher;
+        c.setCid(6);
+        teacher=teacherService.getTeaByid(1);
+        c.setTeacher(teacher);
+        c.setCourse("计算机网络");
+        adminService.updateCourse(c);
+    }
+
+    //查询章节信息
+    @Test
+    public void GetChapters(){
+        Course course=courseService.getCourseByCid(1);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+        for(int i=0;i<c.length;i++){
+            System.out.println(c[i]);
+        }
+    }
+
+    //添加课程
+    @Test
+    public void addCourse(){
+        Course c = new Course();
+        Teacher teacher;
+        teacher=teacherService.getTeaByid(2);
+        c.setTeacher(teacher);
+        c.setCourse("计算机网络");
+        adminService.addCourse(c);
+    }
+
+    //删除章节
+    @Test
+    public void updateCourse(){
+        Course course=courseService.getCourseByCid(1);
+        List<Course_Students> course_students=courseService.findCourse_Students(1);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+        List<String> list = new ArrayList<String>();
+        List<String> listScores = new ArrayList<String>();
+        for (int i=0; i<c.length; i++) {
+            list.add(c[i]);
+        }
+        list.remove(2);
+        String sum =StringUtils.join(list,"||");
+        courseService.updateChapters(sum,1);
+        for (Course_Students student:course_students){
+            int id=student.getStudent().getId();
+            Course_Students cs=studentService.getScores(1,id);
+            String scores=cs.getScores();
+            String[] s=scores.split("\\|\\|");
+            for (int i=0; i<s.length; i++) {
+                listScores.add(s[i]);
+            }
+            listScores.remove(2);
+            String sumScores =StringUtils.join(listScores,"||");
+            courseService.updateScores(sumScores,1,id);
+            listScores.clear();
+        }
+    }
+
+    //添加章节
+    @Test
+    public void AddChapters(){
+        int cid=Integer.parseInt("1");
+        Course course=courseService.getCourseByCid(cid);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+        List<String> list = new ArrayList<String>();
+        for (int i=0;i<c.length;i++){
+            list.add(c[i]);
+        }
+        list.add("第四周");
+        String sum =StringUtils.join(list,"||");
+        System.out.println(sum);
+    }
+
+    //查询某门课所有成绩信息
+    @Test
+    public void findAllScores(){
+        List<Course_Students> course_students=studentService.getScoresAll(1);
+        List<String[]> list=new ArrayList<String[]>();
+        for(Course_Students course_student:course_students) {
+            String scores = course_student.getScores();
+            String[] s = scores.split("\\|\\|");
+            list.add(s);
+        }
+        for (int i=0;i<list.size();i++){
+            System.out.println(list.get(i)[0]);
+        }
+
+    }
+
 }

@@ -94,12 +94,13 @@
           </header>
           <div >
             <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>申请课程ID</td><td>申请课程名称</td><td>学生ID</td><td>学生姓名</td><td>性别</td><td>操作</td></tr>
+              <tr class="font"><td>申请课程ID</td><td>申请课程名称</td><td>学生ID</td><td>学生姓名</td><td>班级</td><td>性别</td><td>操作</td></tr>
               <tr th:each="s:${stuadd}">
                   <td th:text="${s.getCourse().getCid()}"></td>
                   <td th:text="${s.getCourse().getCourse()}"></td>
                   <td th:text="${s.getStudent().getId()}"></td>
-                    <td th:text="${s.getStudent().getSname()}"></td>
+                  <td th:text="${s.getStudent().getSname()}"></td>
+                  <td th:text="${s.getStudent().getClassName().getClassname()}"></td>
                   <!-- 判断男女 -->
                   <td th:if="${s.getStudent().getSsex()==1}">男</td>
                   <td th:if="${s.getStudent().getSsex()==0}">女</td>

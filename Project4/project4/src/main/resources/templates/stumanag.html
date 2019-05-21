@@ -75,7 +75,8 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getSname()}"></h1>
-              <p>学号:<p th:text="${session.loginUser}"></p></p>
+              <p>学号:[[${session.loginUser}]]</p>
+              <p>班级:[[${session.Main.getClassName().getClassname()}]]</p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
@@ -96,11 +97,6 @@
 
 
           <div >
-            <div class="title">
-              <p style="width: 60px; position: absolute;">姓名:<p style="margin-left: 60px;" th:text="${session.Main.getSname()}"></p></p>
-              <p style="width: 60px; position: absolute;">学号:<p style="margin-left: 60px;" th:text="${session.loginUser}"></p></p>
-              <p style="width: 60px; position: absolute;">班级:<p style="margin-left: 60px;" th:text="${session.Main.getSclass()}"></p></p>
-            </div>
             <h1 class="h4" align="center">所选课程</h1>
             <table class="imagetable" border="1"align="center">
 
@@ -114,7 +110,7 @@
                 <td th:if="${c.getTeacher().getTsex()==1}">男</td>
                 <td th:if="${c.getTeacher().getTsex()==0}">女</td>
 
-                <td><a th:href="@{/students/course}">进入</a><br><a th:href="@{/students/grade}">成绩</a></td>
+                <td><a th:href="@{/students/course}">进入</a><br><a th:href="@{/students/scores/{cid}/{id}(cid=${c.getCid()},id=${session.loginUser})}">成绩</a></td>
               </tr>
 
             </table>

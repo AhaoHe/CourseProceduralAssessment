@@ -56,11 +56,8 @@ public interface TeacherMapper {
 //通过ID得到老师信息
     public Teacher getTeaByID(Integer id);
 //添加老师
-    public void addTeacher(Teacher teacher);
-    //修改老师
-    @Update("UPDATE student SET tname=#{tname},tpsw=#{tpsw},tsex=#{tsex} " +
-            "WHERE tid=#{tid}")
-    public int updateTeacher(Teacher teacher);
+    public int addTeacher(Teacher teacher);
 
+    //查询某门课某个学生的成绩
 
 }
