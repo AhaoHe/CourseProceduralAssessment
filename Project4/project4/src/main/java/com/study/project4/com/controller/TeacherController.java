@@ -11,14 +11,13 @@ import com.sun.deploy.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class TeacherController {
@@ -109,7 +108,8 @@ public class TeacherController {
         //5. 把PageInfo对象扔进model，以供后续显示
         model.addAttribute("page", page);
         model.addAttribute("cs",cs);
-
+        //课程id
+        model.addAttribute("cid",cid);
 
 
         //查询章节数
@@ -237,13 +237,18 @@ public class TeacherController {
     }
 
 
-    //查询某个学生的成绩
-    @RequestMapping("/students/scores/{cid}/{id}")
-    public String findScores(@PathVariable("cid") Integer cid,
-                             @PathVariable("id") Integer id,
-                             Model model){
+    //修改/添加学生信息学生的成绩
+    @RequestMapping("/teachers/AddScores")
+    @ResponseBody
+    public Map<String,Object> findScores(@RequestParam("scores")String scores,
+                                         @RequestParam("cid")int cid,
+                                         @RequestParam("id")int id){
+        Map<String,Object> msg=new HashMap<String, Object>();
+        msg.put("msg","修改成功");
 
-return "";
+        courseService.updateScores(scores,cid,id);
+
+        return msg;
     }
 
 }

@@ -45,6 +45,6 @@ public interface StudentsMapper {
     public Course_Students getScoresByCidandId(@Param("cid")int cid,
                                                @Param("id")int id);
     //查询某门课成绩
-    @Select("SELECT * FROM course_students WHERE cid=#{cid}")
+    @Select("SELECT * FROM course_students WHERE cid=#{cid} ORDER By id asc")
     public List<Course_Students> getScoresByCid(int cid);
 }

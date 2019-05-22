@@ -81,7 +81,7 @@ $(document).ready(function () {
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 10,
-                    data: [75, 86, 80, 75, 90, 95],
+                    data: averScore,
                     spanGaps: false
                 }
             ]

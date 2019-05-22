@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -73,7 +74,7 @@ public class StudentController {
 
 
     //查询成绩
-    @RequestMapping("/teachers/StuScores/{id}/{cid}")
+    @RequestMapping("/students/StuScores/{id}/{cid}")
     public String getStuScoresByCidAndId(@PathVariable("cid") Integer cid,
                              @PathVariable("id") Integer id,
                              Model model){
@@ -89,16 +90,33 @@ public class StudentController {
         String[] s=scores.split("\\|\\|");
         model.addAttribute("scores",s);
 
-        //平均成绩
+        //查询所有人的平时成绩
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        List<String[]> list=new ArrayList<String[]>();
+        int a[] = new int[c.length];//平均分的数组,代表每个章节的平均分
+        for(Course_Students course_student:course_students) {
+            String result = course_student.getScores();
+            String[] rt = result.split("\\|\\|");
+            for (int i=0;i<rt.length;i++){
+                int x=Integer.parseInt(rt[i]);
+                a[i]+=x;
+            }
+            list.add(rt);
+        }
+
+
+        //个人平均成绩
         int sum=0;
-        for (String value : s) {
-            int x = Integer.parseInt(value);
+        for (int i=0;i<s.length;i++) {
+            int x = Integer.parseInt(s[i]);
             sum+=x;
+            a[i] /= list.size();//这门课每章节的平均成绩
         }
         int aver=sum/s.length;
         model.addAttribute("aver",aver);
+        model.addAttribute("CourseAver",a);
 
-        return "teachers/course_students";
+        return "students/grade";
 
     }
 }

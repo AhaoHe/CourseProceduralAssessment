@@ -208,14 +208,20 @@ public class Project4ApplicationTests {
     public void findAllScores(){
         List<Course_Students> course_students=studentService.getScoresAll(1);
         List<String[]> list=new ArrayList<String[]>();
+        int aver[] = new int[10];
         for(Course_Students course_student:course_students) {
             String scores = course_student.getScores();
             String[] s = scores.split("\\|\\|");
+            for (int i=0;i<s.length;i++){
+               int x=Integer.parseInt(s[i]);
+               aver[i]+=x;
+            }
             list.add(s);
         }
         for (int i=0;i<list.size();i++){
             System.out.println(list.get(i)[0]);
         }
+        System.out.println(aver[0]);
 
     }
 

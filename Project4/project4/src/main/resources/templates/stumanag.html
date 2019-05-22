@@ -110,7 +110,8 @@
                 <td th:if="${c.getTeacher().getTsex()==1}">男</td>
                 <td th:if="${c.getTeacher().getTsex()==0}">女</td>
 
-                <td><a th:href="@{/students/course}">进入</a><br><a th:href="@{/students/scores/{cid}/{id}(cid=${c.getCid()},id=${session.loginUser})}">成绩</a></td>
+                <td><a th:href="@{/students/course}">进入</a><br>
+                  <a th:href="@{/students/StuScores/{id}/{cid}(cid=${c.getCid()},id=${session.loginUser})}">成绩</a></td>
               </tr>
 
             </table>
