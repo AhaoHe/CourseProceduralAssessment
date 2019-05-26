@@ -70,9 +70,9 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-            <li class="active"><a th:href="@{/studentMain}"> </i>我的信息 </a></li>
-            <li><a th:href="@{/students/AllCourse}"></i>课程管理 </a></li>
-            <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主界面 </a></li>
+            <li class="active"><a th:href="@{/students/StuScores/{cid}(cid=${cid})}"> </i>我的成绩 </a></li>
+            <li><a th:href="@{/students/AllCourse}"></i>签到情况 </a></li>
+            <li><a th:href="@{/studentMain}"> <i class="icon-interface-windows"></i>返回学生主页 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
@@ -89,11 +89,13 @@
 
               <thead><tr class="font" align="center"><th>章节</th><th>成绩</th></tr></thead>
               <tbody>
-              <tr th:each="s,sState:${scores}" align="center">
-                <span th:each="c,cState:${chapters}">
-                  <td th:if="${cState.index}==${sState.index}" th:text="${c.toString()}"></td>
+              <tr th:each="c,cState:${chapters}" align="center">
+                <span >
+                  <td th:text="${c.toString()}"></td>
                 </span>
-                <td th:text="${s.toString()}"></td>
+                <span th:each="s,sState:${scores}">
+                  <td th:if="${cState.index}==${sState.index}" th:text="${s.toString()}"></td>
+                </span>
               </tr>
               </tbody>
             </table>

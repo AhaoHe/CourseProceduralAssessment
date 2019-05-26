@@ -225,4 +225,72 @@ public class Project4ApplicationTests {
 
     }
 
+    //查询签到模式
+    @Test
+    public void findQiandao(){
+        Course course=courseService.getCourseByCid(1);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        List<String> list=new ArrayList<String>();
+        for (int i=0;i<q.length;i++) {
+            list.add(q[i]);
+        }
+        list.remove(1);
+        String sum=StringUtils.join(list,",");
+        System.out.println("sum="+sum);
+    }
+
+    //学生签到
+    @Test
+    public void StudentsQiandao(){
+        int x=1;
+        Course_Students cs=studentService.getScores(1,2016051100);//查询签到信息
+        String arrived=cs.getArrived();
+        String[] a=arrived.split(",");
+
+        Course course=courseService.getCourseByCid(1);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+
+        //x=1正常签到，x=3迟到签到
+        if (x==1 &&q[1].equals("1")) {
+            a[1]="1";
+        }
+        if (x==2 && q[1].equals("3")) {
+            a[1]="3";
+        }
+        String sum=String.join(",",a);
+        System.out.println(sum);
+    }
+
+    //某门课学生签到人数
+    @Test
+    public void StudentFindQiandao(){
+        Course course=courseService.getCourseByCid(1);
+        List<Course_Students> course_students=studentService.getScoresAll(1);
+        int count=studentService.getCourse_Count(1);//这门课总人数
+        int i=0,qdCount=0,cdCount=0;//qdCount签到人数，cdCount迟到人数
+        List<Course_Students> qiandao=new ArrayList<Course_Students>();//签到人名单
+        List<Course_Students> chidao=new ArrayList<Course_Students>();//迟到人名单
+        List<Course_Students> others=new ArrayList<Course_Students>();//未签到人名单
+        for(Course_Students cs:course_students){
+            String arrived=cs.getArrived();
+            String[] a=arrived.split(",");
+            if (a[i].equals("1")||a[i].equals("2")) {
+                qiandao.add(cs);
+                qdCount++;
+            } else if (a[i].equals("3")) {
+                chidao.add(cs);
+                cdCount++;
+            }else{
+                others.add(cs);
+            }
+            i++;
+        }
+        for (Course_Students cs:qiandao){
+            System.out.println(cs.getStudent().getId());
+        }
+
+    }
+
 }

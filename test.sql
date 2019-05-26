@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50721
 File Encoding         : 65001
 
-Date: 2019-05-21 17:59:00
+Date: 2019-05-26 22:29:31
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -39,7 +39,7 @@ CREATE TABLE `classname` (
   `classname` varchar(255) NOT NULL,
   PRIMARY KEY (`classid`),
   KEY `classname` (`classname`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of classname
@@ -60,20 +60,22 @@ CREATE TABLE `course` (
   `course` varchar(255) NOT NULL,
   `tid` int(11) NOT NULL,
   `chapters` varchar(255) NOT NULL DEFAULT '',
+  `ifqiandao` varchar(255) DEFAULT '',
+  `open` int(1) DEFAULT '1',
   PRIMARY KEY (`cid`),
   KEY `tid` (`tid`),
   CONSTRAINT `ct` FOREIGN KEY (`tid`) REFERENCES `teacher` (`tid`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of course
 -- ----------------------------
-INSERT INTO `course` VALUES ('1', 'JavaE', '1', '第1章||第2章');
-INSERT INTO `course` VALUES ('2', '工程实践4', '2', '');
-INSERT INTO `course` VALUES ('3', 'C语言', '1', '');
-INSERT INTO `course` VALUES ('4', '大学英语', '3', '');
-INSERT INTO `course` VALUES ('5', 'Java高级编程', '2', '');
-INSERT INTO `course` VALUES ('6', '计算机网络', '1', '');
+INSERT INTO `course` VALUES ('1', 'JavaEE', '1', '第二章||第三章', '0,0', '0');
+INSERT INTO `course` VALUES ('2', '工程实践4', '2', '', '', '0');
+INSERT INTO `course` VALUES ('3', 'C语言', '1', '第一章||第二章', '', '0');
+INSERT INTO `course` VALUES ('4', '大学英语', '3', '', '', '0');
+INSERT INTO `course` VALUES ('5', 'Java高级编程', '2', '', '', '0');
+INSERT INTO `course` VALUES ('6', '计算机网络', '1', '', '', '0');
 
 -- ----------------------------
 -- Table structure for course_students
@@ -84,6 +86,7 @@ CREATE TABLE `course_students` (
   `id` bigint(100) NOT NULL,
   `ifjoin` int(11) NOT NULL,
   `scores` varchar(255) DEFAULT '',
+  `arrived` varchar(255) DEFAULT '',
   KEY `course_courses` (`cid`),
   KEY `c_students` (`id`),
   CONSTRAINT `c_students` FOREIGN KEY (`id`) REFERENCES `student` (`id`),
@@ -93,9 +96,10 @@ CREATE TABLE `course_students` (
 -- ----------------------------
 -- Records of course_students
 -- ----------------------------
-INSERT INTO `course_students` VALUES ('1', '2016051101', '2', '90||90');
-INSERT INTO `course_students` VALUES ('1', '2016051100', '2', '90||90');
-INSERT INTO `course_students` VALUES ('2', '2016051100', '1', '');
+INSERT INTO `course_students` VALUES ('1', '2016051101', '2', '40||50', '2,0');
+INSERT INTO `course_students` VALUES ('1', '2016051100', '2', '20||50', '1,2');
+INSERT INTO `course_students` VALUES ('2', '2016051100', '1', '', '');
+INSERT INTO `course_students` VALUES ('3', '2016051100', '2', '20||100', '');
 
 -- ----------------------------
 -- Table structure for student
@@ -110,7 +114,7 @@ CREATE TABLE `student` (
   PRIMARY KEY (`id`),
   KEY `sclass` (`classid`),
   CONSTRAINT `classid_classname` FOREIGN KEY (`classid`) REFERENCES `classname` (`classid`)
-) ENGINE=InnoDB AUTO_INCREMENT=2016051103 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2016051107 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of student
@@ -129,7 +133,7 @@ CREATE TABLE `teacher` (
   `tpsw` varchar(255) NOT NULL,
   `tsex` int(1) NOT NULL,
   PRIMARY KEY (`tid`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of teacher

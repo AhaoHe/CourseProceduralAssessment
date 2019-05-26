@@ -5,6 +5,15 @@ public class Course_Students {
     Student student;
     int ifjoin;
     String scores;
+    String arrived;
+
+    public String getArrived() {
+        return arrived;
+    }
+
+    public void setArrived(String arrived) {
+        this.arrived = arrived;
+    }
 
     public String getScores() {
         return scores;

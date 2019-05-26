@@ -42,8 +42,8 @@
               <!-- Navbar Header-->
               <div class="navbar-header">
                 <!-- Navbar Brand --><a href="index.html" class="navbar-brand d-none d-sm-inline-block">
-                  <div class="brand-text d-none d-lg-inline-block"><strong>侧栏</strong></div>
-                  <div class="brand-text d-none d-sm-inline-block d-lg-none"><strong>BD</strong></div></a>
+                <div class="brand-text d-none d-lg-inline-block"><strong>侧栏</strong></div>
+                <div class="brand-text d-none d-sm-inline-block d-lg-none"><strong>BD</strong></div></a>
                 <!-- Toggle Button--><a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
               </div>
               <!-- Navbar Menu -->
@@ -54,29 +54,29 @@
                 <li onclick="test();" class="nav-item dropdown"> <a id="notifications" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link"><i class="fa fa-bell-o"></i>
                   <span id="msgCount" class="badge bg-red badge-corner">[[${session.msgCount}]]</span></a>
                   <ul id="messages" aria-labelledby="notifications" class="dropdown-menu">
-                    <li><a rel="nofollow" href="#" class="dropdown-item"> 
-                        <div class="notification">
+                    <li><a rel="nofollow" href="#" class="dropdown-item">
+                      <div class="notification">
 
-                        </div></a></li>
+                      </div></a></li>
                     <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>view all notifications                                            </strong></a></li>
                   </ul>
                 </li>
 
                 <script language='javascript' th:inline="javascript">
                     /* <![CDATA[ */
-                  function test() {
-                      //动态创建li的方式，使用拼接html的方式 （推荐）
-                      var html = "";
-                      for(var i=0;i<[[${session.warn}]].length;i++){
-                          if ([[${session.warn}]][i]!="empty") {
-                              html += "<li>";
-                              html += "<a rel=\"nofollow\" href=\"#\" class=\"dropdown-item all-notifications text-center\"><strong style='color: red'>" + [[${session.warn}]][i] + "</strong></a>"
-                              html += "</li>";
-                          }
-                      }
-                      //生成新表格
-                      $("#messages").html(html);
-                  }
+                    function test() {
+                        //动态创建li的方式，使用拼接html的方式 （推荐）
+                        var html = "";
+                        for(var i=0;i<[[${session.warn}]].length;i++){
+                            if ([[${session.warn}]][i]!="empty") {
+                                html += "<li>";
+                                html += "<a rel=\"nofollow\" href=\"#\" class=\"dropdown-item all-notifications text-center\"><strong style='color: red'>" + [[${session.warn}]][i] + "</strong></a>"
+                                html += "</li>";
+                            }
+                        }
+                        //生成新表格
+                        $("#messages").html(html);
+                    }
                     /* ]]> */
                 </script>
 
@@ -101,40 +101,49 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a th:href="@{/studentMain}"> </i>我的信息 </a></li>
-                    <li><a th:href="@{/students/AllCourse}"></i>课程管理 </a></li>
-                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主界面 </a></li>
+                    <li class="active"><a th:href="@{/students/checkArrived/{cid}(cid=${CourseID})}"> </i>签到 </a></li>
+                    <li><a th:href="@{/students/AllCourse}"></i>上传作业 </a></li>
+                    <li><a th:href="@{/studentMain}"> <i class="icon-interface-windows"></i>返回学生界面 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">我的信息</h2>
+              <h2 class="no-margin-bottom">[[${cname}]]</h2>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
 
 
           <div >
-            <h1 class="h4" align="center">所选课程</h1>
+            <br>
             <table class="table table-hover table-bordered" border="1"align="center">
 
-              <tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>性别</th><th>操作</th></tr>
-              <tr th:each="c:${courses}">
-                <td th:text="${c.getCid()}"></td>
-                <td th:text="${c.getCourse()}"></td>
-                <td th:text="${c.getTeacher().getTname()}"></td>
+              <thead><tr class="font"><th>签到序列</th><th>签到情况</th><th>操作</th></tr></thead>
+              <tbody>
+              <tr th:each="a,aState:${arrived}">
+                <td th:text="'第'+${aState.count}+'次签到'"></td>
 
-                <!-- 判断男女 -->
-                <td th:if="${c.getTeacher().getTsex()==1}">男</td>
-                <td th:if="${c.getTeacher().getTsex()==0}">女</td>
+                <!--签到情况-->
+                <td th:if="${a.toString()}=='1'" th:text="已签到" style="color: green"></td>
+                <td th:if="${a.toString()}=='0'" th:text="未签到" style="color: red"></td>
+                <td th:if="${a.toString()}=='3'" th:text="迟到" style="color: blue"></td>
+                <td th:if="${a.toString()}=='2'" th:text="请假or其他情况" style="color: blue"></td>
 
-                <td><a th:href="@{/students/checkArrived/{cid}(cid=${c.getCid()})}" class="btn btn-info">进入</a>
-                  <a th:href="@{/students/StuScores/{cid}(cid=${c.getCid()})}"
-                     class="btn btn-info">成绩</a></td>
+                <td>
+                  <span th:each="q,qState:${ifqiandao}">
+                    <a th:if="${q.toString()=='1'} and ${qState.index}==${aState.index}" class="btn btn-info"
+                       th:href="@{/students/clickArrived/{cid}/{index}/{x}(cid=${CourseID},index=${aState.index},x=1)}">签到</a>
+                    <a th:if="${q.toString()=='3'} and ${a.toString()}!='1' and ${qState.index}==${aState.index}" class="btn btn-danger"
+                       th:href="@{/students/clickArrived/{cid}/{index}/{x}(cid=${CourseID},index=${aState.index},x=3)}">签到(迟到)</a>
+                    <a th:if="${q.toString()=='3'} and ${a.toString()}=='1' and ${qState.index}==${aState.index}"
+                       style="color: red">迟到人员签到中</a>
+                    <a th:if="${q.toString()=='0'} and ${qState.index}==${aState.index}">已过期/已关闭</a>
+                  </span>
+                </td>
               </tr>
-
+              </tbody>
             </table>
           </div>
           <style type="text/css">

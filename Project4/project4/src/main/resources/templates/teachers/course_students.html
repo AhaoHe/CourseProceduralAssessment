@@ -75,7 +75,7 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
-              <p>老师编号：<p th:text="${session.loginUser}"></p></p>
+              <p>老师编号：[[${session.loginUser}]]</p></p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
@@ -231,9 +231,9 @@
                           success: function(data) {
                               //$('#editScores').off('click');
                               //$('#StuBtn').off('click');
-                              parent.location.reload();
                               $('#editModal').modal('hide');
                               alert(data.msg);
+                              parent.location.reload();
                           }
                       });
                   });

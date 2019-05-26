@@ -1,9 +1,8 @@
 package com.study.project4.com.controller;
 
-import com.study.project4.com.entity.Admin;
-import com.study.project4.com.entity.Student;
-import com.study.project4.com.entity.Teacher;
+import com.study.project4.com.entity.*;
 import com.study.project4.com.service.AdminService;
+import com.study.project4.com.service.CourseService;
 import com.study.project4.com.service.StudentService;
 import com.study.project4.com.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -23,6 +23,8 @@ public class LoginController {
     StudentService stu=new StudentService();
     @Autowired
     TeacherService tea=new TeacherService();
+    @Autowired
+    CourseService courseService=new CourseService();
     @Autowired
     AdminService ad=new AdminService();
 
@@ -66,6 +68,44 @@ public class LoginController {
                 session.setAttribute("loginUser",stuname);
                 session.setAttribute("User","student");
                 session.setAttribute("Main",loginStu);
+
+
+                //查询有无即将挂科成绩
+                List<Course> courses=courseService.getCourseById(stuname);
+                String warn[]=new String[courses.size()];
+                int count=0;
+                int msgCount=0;//消息的数量
+                for (Course course:courses){
+                    int cid=course.getCid();
+                    String cname=course.getCourse();
+                    //查询成绩
+                    Course_Students cs=stu.getScores(cid,stuname);
+                    String scores=cs.getScores();
+                    String[] s=scores.split("\\|\\|");
+                    //计算每门课的个人平均成绩
+                    int sum=0;
+                    int isCount=0;
+                    for (int i=0;i<s.length;i++) {
+                        if (!s[i].equals("empty")){
+                            int x = Integer.parseInt(s[i]);
+                            sum += x;
+                            isCount++;
+                        }
+                    }
+                    int aver=sum/isCount;//平时成绩
+                    //判断成绩是否需要警告
+                    if (aver<60){
+                        warn[count]="亲，"+cname+"要挂科了！！";
+                        msgCount++;
+                    }else {
+                        warn[count]="empty";
+                    }
+                    count++;
+                }
+                session.setAttribute("warn",warn);
+                session.setAttribute("msgCount",msgCount);
+
+
                 return "redirect:/";
             } else {
                 //登录失败，返回登录页面

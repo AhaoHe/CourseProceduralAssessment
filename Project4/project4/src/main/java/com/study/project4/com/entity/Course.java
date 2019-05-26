@@ -7,6 +7,24 @@ public class Course {
     int ifjoin;
     Teacher teacher;
     String chapters;
+    String  counts;
+    String ifqiandao;
+
+    public String getIfqiandao() {
+        return ifqiandao;
+    }
+
+    public void setIfqiandao(String ifqiandao) {
+        this.ifqiandao = ifqiandao;
+    }
+
+    public String getCounts() {
+        return counts;
+    }
+
+    public void setCounts(String counts) {
+        this.counts = counts;
+    }
 
     public String getChapters() {
         return chapters;

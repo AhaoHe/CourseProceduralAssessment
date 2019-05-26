@@ -3,8 +3,8 @@ package com.study.project4.com.service;
 import com.study.project4.com.dao.TeacherMapper;
 import com.study.project4.com.entity.Course;
 import com.study.project4.com.entity.Course_Students;
-import com.study.project4.com.entity.Student;
 import com.study.project4.com.entity.Teacher;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,5 +46,14 @@ public class TeacherService {
     //申请删除某个学生
     public int deleteT_S(Integer cid,Integer id){
         return teacherMapper.deleteTStudents(cid,id);
+    }
+
+    //更改签到情况 ifqiandao=0为未开启签到，=1开启签到，=3开启迟到模式
+    public int updateQiandao(int cid,String sum){
+        return teacherMapper.updateQiandao(cid,sum);
+    }
+    //添加学生签到情况
+    public int updateStuQiandao(int cid,String sum){
+        return teacherMapper.updateStuQiandao(cid,sum);
     }
 }

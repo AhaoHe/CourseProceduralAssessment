@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN"  xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>课程过程化管理 </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" th:href="@{/static/vendor/bootstrap/css/bootstrap.min.css}">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" th:href="@{/static/vendor/font-awesome/css/font-awesome.min.css}">
+    <!-- Fontastic Custom icon font-->
+    <link rel="stylesheet" th:href="@{/static/css/fontastic.css}">
+    <!-- Google fonts - Poppins -->
+    <link rel="stylesheet" th:href="@{https://fonts.googleapis.com/css?family=Poppins:300,400,700}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" th:href="@{/static/css/style.default.css}" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" th:href="@{/static/css/custom.css}">
+    <!-- Favicon-->
+    <link rel="shortcut icon" th:href="@{/static/img/favicon.ico}">
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <body>
+    <div class="page">
+      <!-- Main Navbar-->
+      <header class="header">
+        <nav class="navbar">
+          <!-- Search Box-->
+          <div class="search-box">
+            <button class="dismiss"><i class="icon-close"></i></button>
+            <form id="searchForm" action="#" role="search">
+              <input type="search" placeholder="What are you looking for..." class="form-control">
+            </form>
+          </div>
+          <div class="container-fluid">
+            <div class="navbar-holder d-flex align-items-center justify-content-between">
+              <!-- Navbar Header-->
+              <div class="navbar-header">
+                <!-- Navbar Brand --><a href="index.html" class="navbar-brand d-none d-sm-inline-block">
+                  <div class="brand-text d-none d-lg-inline-block"><strong>侧栏</strong></div>
+                  <div class="brand-text d-none d-sm-inline-block d-lg-none"><strong>BD</strong></div></a>
+                <!-- Toggle Button--><a id="toggle-btn" href="#" class="menu-btn active"><span></span><span></span><span></span></a>
+              </div>
+              <!-- Navbar Menu -->
+              <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
+                <!-- Search-->
+                <li class="nav-item d-flex align-items-center"><a id="search" href="#"><i class="icon-search"></i></a></li>
+                <!-- Notifications-->
+                <li class="nav-item dropdown"> <a id="notifications" rel="nofollow" data-target="#" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link"><i class="fa fa-bell-o"></i><span class="badge bg-red badge-corner">1</span></a>
+                  <ul aria-labelledby="notifications" class="dropdown-menu">
+                    <li><a rel="nofollow" href="#" class="dropdown-item"> 
+                        <div class="notification">
+
+                        </div></a></li>
+                    <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>view all notifications                                            </strong></a></li>
+                  </ul>
+                </li>
+                <!-- Logout    -->
+                <li class="nav-item"><a th:href="@{/logout}" class="nav-link logout"> <span class="d-none d-sm-inline">退出登录</span><i class="fa fa-sign-out"></i></a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="page-content d-flex align-items-stretch"> 
+        <!-- Side Navbar -->
+        <nav class="side-navbar">
+          <!-- Sidebar Header-->
+          <div class="sidebar-header d-flex align-items-center">
+            <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
+            <div class="title">
+              <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
+              <p>老师编号：[[${session.loginUser}]]</p>
+            </div>
+          </div>
+          <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
+          <ul class="list-unstyled">
+                    <li class="active"><a th:href="@{/teachers/course_qiandao/{cid}(cid=${courseID})}"> </i>签到系统</a></li>
+                    <li><a th:href="@{/teacherMain}"> <i class="icon-interface-windows"></i>返回我的信息 </a></li>
+          </ul>
+        </nav>
+        <div class="content-inner">
+          <!-- Page Header-->
+          <header class="page-header">
+            <div class="container-fluid">
+              <a class="no-margin-bottom" style="margin-right: 80%;" th:href="@{/teacherMain}">返回</a>
+              <a type="button" class="btn btn-info" th:href="@{/teachers/AddQiandao/{cid}(cid=${courseID})}">添加签到</a>
+            </div>
+          </header>
+
+          <br>
+
+          <div >
+            <table id="table" class="table table-hover table-bordered" border="1" align="center">
+              <thead align="center"><tr class="font"><td>签到名称</td><td>签到情况</td><td>操作</td></tr></thead>
+              <tbody>
+              <tr th:each="q,qStat:${ifqiandao}">
+
+                <td th:if="${q.toString()}!=''" th:text="'第'+${qStat.count}+'次签到'" style="width: 15%" align="center"></td>
+
+                <td th:if="${q.toString()}!=''" style="width: 45%" align="center">
+                  <button class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="qiandaoInfo([[${qStat.index}]])">已签到名单</button>
+                  <button class="btn btn-info" data-toggle="modal" data-target="#chidaoModal" th:onclick="chidaoInfo([[${qStat.index}]])">迟到名单</button>
+                  <button class="btn btn-info" data-toggle="modal" data-target="#othersModal" th:onclick="ohtersInfo([[${qStat.index}]])">未签到名单</button>
+                </td>
+
+                <td th:if="${q.toString()}!=''" style="width: 40%">
+                  <a class="btn btn-danger" onclick="return sumbit_form()"
+                     th:href="@{/teachers/DelQiandao/{cid}/{index}(cid=${courseID},index=${qStat.index})}">删除</a>
+
+                  <!--签到模式-->
+                    <a th:if="${q.toString()}=='0'" class="btn btn-info"
+                       th:href="@{/teachers/UpdateQiandao/{cid}/{x}/{index}(cid=${courseID},x=1,index=${qStat.index})}">开始签到</a>
+                    <a th:if="${q.toString()}=='1'" class="btn btn-danger"
+                       th:href="@{/teachers/UpdateQiandao/{cid}/{x}/{index}(cid=${courseID},x=0,index=${qStat.index})}">停止签到</a>
+                    <a th:if="${q.toString()}=='0'" class="btn btn-info"
+                       th:href="@{/teachers/UpdateQiandao/{cid}/{x}/{index}(cid=${courseID},x=3,index=${qStat.index})}">开启迟到模式</a>
+                    <a th:if="${q.toString()}=='3'" class="btn btn-danger"
+                       th:href="@{/teachers/UpdateQiandao/{cid}/{x}/{index}(cid=${courseID},x=0,index=${qStat.index})}">停止迟到模式</a>
+
+                </td>
+              </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+          <script language="javascript">
+              function sumbit_form(){
+                  var ifdel=confirm("是否真的删除?");
+                  if (ifdel==true){
+                      return true;
+                  }else{
+                      return false;
+                  }
+              }
+          </script>
+
+
+          <!--签到名单-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="editModalLabel">
+                    已签到情况-签到人数:，总人数:[[${count}]]
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
+                  <div class="modal-body">
+
+                    <table class="table table-hover table-bordered" border="1" align="center">
+
+                      <thead>
+                        <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
+                      </thead>
+
+                      <tbody id="StuQiandao">
+                        <tr>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+
+                    </table>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
+          <script language='javascript' th:inline="javascript">
+            function qiandaoInfo(index) {
+                /*<![CDATA[*/
+                var addUrl = /*[[@{/teachers/getQiandao}]]*/;//获取动作地址
+                $.ajax({
+                    type: "POST",
+                    url: addUrl,
+                    dataType:'json',
+                    data: {
+                        "index": index,
+                        "cid": [[${courseID}]]
+                    },
+                    success: function(data) {
+                        makeTable(data);
+                    }
+                });
+
+                function makeTable(data) {
+                    var list=data;
+
+                    //动态创建表格的方式，使用拼接html的方式 （推荐）
+                    var html = "";
+                    var result="已签到情况-签到人数:"+"<span style='color: red'>"+list.length+"</span>"+"，总人数: "+[[${count}]];
+                    for( var i = 0; i < list.length; i++ ) {
+                        html += "<tr>";
+                        html +=     "<td>" + list[i].student.id + "</td>"
+                        html +=     "<td>" + list[i].student.sname + "</td>"
+                        if(list[i].arrived=="1"){
+                          html +=   "<td>" + "已签到" + "</td>"
+                        }else {
+                          html +=   "<td>" + "请假or其他情况" + "</td>"
+                        }
+                        html += "</tr>";
+                    }
+                    //生成新表格
+                    $("#StuQiandao").html(html);
+                    $("#editModalLabel").html(result);
+                }
+                /*]]>*/
+            }
+
+          </script>
+
+
+
+
+
+
+          <!--迟到名单-->
+          <div class="modal fade" id="chidaoModal" tabindex="-1" role="dialog" aria-labelledby="chidaoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="chidaoModalLabel">
+                    已签到情况-签到人数:，总人数:[[${count}]]
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
+                  <div class="modal-body">
+
+                    <table class="table table-hover table-bordered" border="1" align="center">
+
+                      <thead>
+                      <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
+                      </thead>
+
+                      <tbody id="StuChidao">
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                      </tbody>
+
+                    </table>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+              function chidaoInfo(index) {
+                  /*<![CDATA[*/
+                  var addUrl = /*[[@{/teachers/getChidao}]]*/;//获取动作地址
+                  $.ajax({
+                      type: "POST",
+                      url: addUrl,
+                      dataType:'json',
+                      data: {
+                          "index": index,
+                          "cid": [[${courseID}]]
+                      },
+                      success: function(data) {
+                          makeTable(data);
+                      }
+                  });
+
+                  function makeTable(data) {
+                      var list=data;
+                      //动态创建表格的方式，使用拼接html的方式 （推荐）
+                      var html = "";
+                      var result="迟到情况-迟到人数:"+"<span style='color: red'>"+list.length+"</span>"+"，总人数: "+[[${count}]];
+                      for( var i = 0; i < list.length; i++ ) {
+                          html += "<tr>";
+                          html +=     "<td>" + list[i].student.id + "</td>"
+                          html +=     "<td>" + list[i].student.sname + "</td>"
+                          if(list[i].arrived=="3"){
+                              html +=   "<td>" + "迟到" + "</td>"
+                          }
+                          html += "</tr>";
+                      }
+                      //生成新表格
+                      $("#StuChidao").html(html);
+                      $("#chidaoModalLabel").html(result);
+                  }
+                  /*]]>*/
+              }
+
+          </script>
+
+
+
+          <!--缺勤名单-->
+          <div class="modal fade" id="othersModal" tabindex="-1" role="dialog" aria-labelledby="othersModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="othersModalLabel">
+                    已签到情况-签到人数:，总人数:[[${count}]]
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
+                  <div class="modal-body">
+
+                    <table class="table table-hover table-bordered" border="1" align="center">
+
+                      <thead>
+                      <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
+                      </thead>
+
+                      <tbody id="StuOthers">
+                      <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                      </tbody>
+
+                    </table>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                      提交
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+              function ohtersInfo(index) {
+                  /*<![CDATA[*/
+                  var addUrl = /*[[@{/teachers/getOthers}]]*/;//获取动作地址
+                  $.ajax({
+                      type: "POST",
+                      url: addUrl,
+                      dataType:'json',
+                      data: {
+                          "index": index,
+                          "cid": [[${courseID}]]
+                      },
+                      success: function(data) {
+                          makeTable(data);
+                      }
+                  });
+
+                  function makeTable(data) {
+                      var list=data;
+                      //动态创建表格的方式，使用拼接html的方式 （推荐）
+                      var html = "";
+                      var result="缺勤情况-缺勤人数:"+"<span style='color: red'>"+list.length+"</span>"+"，总人数: "+[[${count}]];
+                      for( var i = 0; i < list.length; i++ ) {
+                          html += "<tr>";
+                          html +=     "<td>" + list[i].student.id + "</td>"
+                          html +=     "<td>" + list[i].student.sname + "</td>"
+                          if(list[i].arrived=="0"){
+                              html +=   "<td>" + "缺勤" + "</td>"
+                          }
+                          html += "</tr>";
+                      }
+                      //生成新表格
+                      $("#StuOthers").html(html);
+                      $("#othersModalLabel").html(result);
+                  }
+                  /*]]>*/
+              }
+
+          </script>
+
+
+          <style type="text/css">
+            button  {
+              background:#b5cfd2 url('css/bulecell.jpg');
+            }
+            tr.font {
+              font-size: 20px;
+            }
+            table.imagetable {
+              font-family: verdana,arial,sans-serif;
+              font-size:11px;
+              color:#333333;
+              border-width: 1px;
+              border-color: #999999;
+              border-collapse: collapse;
+            }
+            table.imagetable th {
+              background:#b5cfd2 url('css/bulecell.jpg');
+              border-width: 1px;
+              padding: 8px;
+              border-style: solid;
+              border-color: #999999;
+            }
+            table.imagetable td {
+              background:#dcddc0 url('css/greycell.jpg');
+              border-width: 1px;
+              padding: 8px;
+              border-style: solid;
+              border-color: #999999;
+            }
+          </style>
+
+          <!-- Page Footer-->
+          <footer class="main-footer">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm-6">
+                  <p>成都信息工程大学 &copy; 2019</p>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+    <!-- JavaScript files-->
+    <script th:src="@{/static/vendor/jquery/jquery.min.js}"></script>
+    <script th:src="@{/static/vendor/popper.js/umd/popper.min.js}"> </script>
+    <script th:src="@{/static/vendor/bootstrap/js/bootstrap.min.js}"></script>
+    <script th:src="@{/static/vendor/jquery.cookie/jquery.cookie.js}"> </script>
+    <script th:src="@{/static/vendor/chart.js/Chart.min.js}"></script>
+    <script th:src="@{/static/vendor/jquery-validation/jquery.validate.min.js}"></script>
+    <script th:src="@{/static/js/charts-home.js}"></script>
+    <!-- Main File-->
+    <script th:src="@{/static/js/front.js}"></script>
+  </body>
+</html>

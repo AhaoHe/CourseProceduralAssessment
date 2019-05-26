@@ -14,10 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class TeacherController {
@@ -68,11 +65,40 @@ public class TeacherController {
                            @PathVariable("Sid") Integer Sid,
                            @PathVariable("x") Integer x){
         teacherService.allowStudents(Cid, Sid);
+
+        //初始化学生成绩
+            //查询章节信息
+        Course course=courseService.getCourseByCid(Cid);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+        List<String> list=new ArrayList<String>();//成绩list
+        if(!c[0].isEmpty()) {
+            for (int i = 0; i < c.length; i++) {//添加成绩
+                list.add("empty");
+            }
+            String sumScores = StringUtils.join(list, "||");
+            courseService.updateScores(sumScores, Cid, Sid);//添加成绩到数据库
+        }
+
+
+        //初始化学生签到情况
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        if(!q[0].isEmpty()) {
+            for (int i = 0; i < q.length; i++) {
+                q[i] = "2";
+            }
+            String sum = String.join(",", q);
+            studentService.updateArrived(sum, Cid, Sid);
+        }
+
+
         if(x==1){
             return "redirect:/teachers/AllCourse";
         }else {
             return "redirect:/teachers/course_students/"+Cid;
         }
+
     }
 
     //丑拒学生添加课程,x是判断重定向到哪个页面 ,删除申请信息
@@ -88,6 +114,11 @@ public class TeacherController {
     public String deleteStu(@PathVariable("id")Integer id,
                             @PathVariable("cid")Integer cid){
         teacherService.deleteT_S(cid,id);
+        //查询章节数
+        Course course=courseService.getCourseByCid(cid);
+        String chapters=course.getChapters();
+        String[] c=chapters.split("\\|\\|");
+
         return "redirect:/teachers/course_students/"+cid;
     }
 
@@ -134,8 +165,7 @@ public class TeacherController {
     //查询某门课程有哪些章节
     @GetMapping("/teachers/course/{cid}")
     public String courses_main(@PathVariable("cid")int cid,
-                               Model model,
-                               HttpSession session){
+                               Model model){
         Course course=courseService.getCourseByCid(cid);
         String chapters=course.getChapters();
         String[] c=chapters.split("\\|\\|");
@@ -205,7 +235,11 @@ public class TeacherController {
             for (int i=0; i<s.length; i++) {
                 listScores.add(s[i]);
             }
-            listScores.add(BeginScore);
+            if (BeginScore.isEmpty()){
+                listScores.add("empty");
+            }else {
+                listScores.add(BeginScore);
+            }
             String sumScores =StringUtils.join(listScores,"||");
             courseService.updateScores(sumScores,cid,Stuid);
             listScores.clear();
@@ -249,6 +283,158 @@ public class TeacherController {
         courseService.updateScores(scores,cid,id);
 
         return msg;
+    }
+
+    //查询签到信息
+    @GetMapping("/teachers/course_qiandao/{cid}")
+    public String qiandao_main(@PathVariable("cid")int cid,
+                               Model model){
+        Course course=courseService.getCourseByCid(cid);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        model.addAttribute("ifqiandao",q);
+        model.addAttribute("courseID",cid);
+
+        int count=studentService.getCourse_Count(cid);//这门课总人数
+        model.addAttribute("count",count);
+
+        return "teachers/qiandao";
+    }
+
+    //查询已经签到的人
+    @RequestMapping("/teachers/getQiandao")
+    @ResponseBody
+    public List<Course_Students> qiandao_Already(@RequestParam("cid")int cid,
+                                                 @RequestParam("index")int index){
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        List<Course_Students> qiandao=new ArrayList<Course_Students>();//签到人名单
+        for(Course_Students cs:course_students){
+            String arrived=cs.getArrived();
+            String[] a=arrived.split(",");
+            if (a[index].equals("1")||a[index].equals("2")) {
+                if (a[index].equals("1")) {
+                    cs.setArrived("1");
+                }else {
+                    cs.setArrived("2");
+                }
+                qiandao.add(cs);
+            }
+        }
+
+        return qiandao;
+    }
+    //查询迟到的人
+    @RequestMapping("/teachers/getChidao")
+    @ResponseBody
+    public List<Course_Students> chidao_Already(@RequestParam("cid")int cid,
+                                                @RequestParam("index")int index){
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        List<Course_Students> chidao=new ArrayList<Course_Students>();//迟到人名单
+        for(Course_Students cs:course_students){
+            String arrived=cs.getArrived();
+            String[] a=arrived.split(",");
+            if (a[index].equals("3")) {
+                cs.setArrived("3");
+                chidao.add(cs);
+            }
+        }
+
+        return chidao;
+    }
+    //查询旷课的人
+    @RequestMapping("/teachers/getOthers")
+    @ResponseBody
+    public List<Course_Students> others_Already(@RequestParam("cid")int cid,
+                                                @RequestParam("index")int index){
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        List<Course_Students> others=new ArrayList<Course_Students>();//未签到人名单
+        for(Course_Students cs:course_students){
+            String arrived=cs.getArrived();
+            String[] a=arrived.split(",");
+            if (a[index].equals("0")) {
+                cs.setArrived("0");
+                others.add(cs);
+            }
+        }
+
+        return others;
+    }
+
+    //更改签到情况
+    @GetMapping("/teachers/UpdateQiandao/{cid}/{x}/{index}")
+    public String updateQiandao(@PathVariable("cid")int cid,
+                                @PathVariable("x")int x,
+                                @PathVariable("index")int index){
+        Course course=courseService.getCourseByCid(cid);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        q[index]=String.valueOf(x);
+        String sum=String.join(",",q);
+        teacherService.updateQiandao(cid, sum);
+        return "redirect:/teachers/course_qiandao/"+cid;
+    }
+
+    //添加签到
+    @GetMapping("/teachers/AddQiandao/{cid}")
+    public String addQiandao(@PathVariable("cid")int cid){
+        Course course=courseService.getCourseByCid(cid);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        List<String> list=new ArrayList<String>();
+        for (int i=0;i<q.length;i++) {
+            list.add(q[i]);
+        }
+        list.add("0");
+        String sum=StringUtils.join(list,",");
+        teacherService.updateQiandao(cid, sum);
+
+        //给所有学生添加签到信息
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        for (Course_Students cs:course_students){
+            String csQiandao=cs.getArrived();
+            String[] CSQ=csQiandao.split(",");
+            List<String> Stulist=new ArrayList<String>();
+            for (int i=0;i<q.length;i++) {
+                Stulist.add(q[i]);
+            }
+            Stulist.add("0");
+            String StuSum=StringUtils.join(list,",");
+            teacherService.updateStuQiandao(cid,StuSum);
+        }
+
+        return "redirect:/teachers/course_qiandao/"+cid;
+    }
+
+    //删除签到
+    @GetMapping("/teachers/DelQiandao/{cid}/{index}")
+    public String delQiandao(@PathVariable("cid")int cid,
+                             @PathVariable("index")int index){
+        Course course=courseService.getCourseByCid(cid);
+        String ifqiandao=course.getIfqiandao();//签到模式
+        String[] q=ifqiandao.split(",");
+        List<String> list=new ArrayList<String>();
+        for (int i=0;i<q.length;i++) {
+            list.add(q[i]);
+        }
+        list.remove(index);
+        String sum=StringUtils.join(list,",");
+        teacherService.updateQiandao(cid, sum);
+
+        //给所有学生删除签到信息
+        List<Course_Students> course_students=studentService.getScoresAll(cid);
+        for (Course_Students cs:course_students){
+            String csQiandao=cs.getArrived();
+            String[] CSQ=csQiandao.split(",");
+            List<String> Stulist=new ArrayList<String>();
+            for (int i=0;i<q.length;i++) {
+                Stulist.add(q[i]);
+            }
+            Stulist.remove(index);
+            String StuSum=StringUtils.join(list,",");
+            teacherService.updateStuQiandao(cid,StuSum);
+        }
+
+        return "redirect:/teachers/course_qiandao/"+cid;
     }
 
 }

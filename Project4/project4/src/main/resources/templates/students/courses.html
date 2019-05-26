@@ -98,14 +98,15 @@
 
           <div >
             <h1 class="h4" align="center">所有课程</h1>
-            <table class="imagetable" border="1"align="center">
+            <table class="table table-hover table-bordered" border="1"align="center">
 
-              <tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>老师性别</th><th>操作</th></tr>
+              <thead><tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>老师性别</th><th>操作</th></tr></thead>
               <!--<script type="text/javascript" th:inline="javascript">
                   /* <![CDATA[ */
                       var count;
                   /* ]]> */
               </script>-->
+              <tbody>
               <tr th:each="c:${courses}">
                 <form th:action="@{/students/addCourse}">
                   <input style="display: none;" name="Cid" th:value="${c.getCid()}">
@@ -120,7 +121,7 @@
                   <td th:if="${c.getIfjoin()==2}" style="color: green;">已添加</td>
                   <td th:if="${c.getIfjoin()==1}" style="color: red;">申请中</td>
                   <td th:if="${c.getIfjoin()==3}" style="color: red;">退课中</td>
-                  <td th:if="${c.getIfjoin()==0}"><button type="submit">申请</button></td>
+                  <td th:if="${c.getIfjoin()==0}"><button type="submit" class="btn btn-info">申请</button></td>
                 </form>
                 <!--<div th:each="j:${ifjoin}">
                   <td th:if="${c.getCid()==j.getCid()&&j.getIfjoin()==2}" style="color: green;">已添加</td>
@@ -128,6 +129,7 @@
                   <td th:if="${c.getIfjoin()==3}"><a th:href="@{/}">申请</a></td>
                 </div>-->
               </tr>
+              </tbody>
             </table>
             <div style="text-align: center">
               <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->

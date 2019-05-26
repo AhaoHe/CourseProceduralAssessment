@@ -94,6 +94,7 @@
             <div class="container-fluid">
               <button type="button" class="btn btn-info"
                       data-toggle="modal" data-target="#addModal">添加课程</button>
+              <button type="button" class="btn btn-danger" id="delCousers" onclick="delCousers();">批量删除</button>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
@@ -103,10 +104,14 @@
           <div class="container">
             <table id="table" class="table table-hover table-bordered" border="1" align="center">
               <thead>
-                <tr class="font"><td>课程编号</td><td>课程名称</td><td>老师名称</td><td>性别</td><td>操作</td></tr>
+                <tr class="font">
+                    <td><input type="checkbox" name="items" onclick="checkAll(this)"> 全选</td>
+                    <td>课程编号</td><td>课程名称</td><td>老师名称</td><td>性别</td><td>操作</td>
+                </tr>
               </thead>
               <tbody>
               <tr th:each="c,cState:${courses}">
+                <td><input type="checkbox" id="item" name="item" th:value="${c.getCid()}" /></td>
                 <td th:text="${c.getCid()}"></td>
                 <td th:text="${c.getCourse()}"></td>
                 <td th:text="${c.getTeacher().getTname()}"></td>
@@ -188,7 +193,7 @@
 
 
 
-          <script>
+          <script language='javascript' th:inline="javascript">
               // 编辑课程
               function editInfo(obj) {
                   var id=$(obj).attr("id");
@@ -204,7 +209,47 @@
                           tid.options[i].selected = true;
                       }
                   }
+              }
+              //全选课程
+              function checkAll(c) {
+                  var status = c.checked;
+                  var oItems = document.getElementsByName('item');
+                  for(var i=0;i<oItems.length;i++){
+                      oItems[i].checked=status;
+                  }
+              }
 
+              //删除所有选中
+              function delCousers() {
+                  /*<![CDATA[*/
+                  //判断至少写了一项
+                  var checkedNum = $("input[name='item']:checked").length;
+                  if(checkedNum==0){
+                      alert("请至少选择一项!");
+                      return false;
+                  }
+                  if(confirm("确定删除所选项目?")) {
+                      var checkedList = new Array();
+                      var delsUrl = /*[[@{/Admin/deleteCs}]]*/;//获取动作地址
+                      $("input[name='item']:checked").each(function () {
+                          checkedList.push($(this).val());
+                      });
+                      $.ajax({
+                          type: "POST",
+                          url: delsUrl,
+                          data: {
+                              "delitems": checkedList.toString()
+                          },
+                          datatype: 'json',
+                          success: function (data) {
+                              location.reload();//页面刷新
+                          },
+                          error: function (data) {
+                              art.dialog.tips('删除失败!');
+                          }
+                      });
+                  }
+                  /*]]>*/
               }
           </script>
 

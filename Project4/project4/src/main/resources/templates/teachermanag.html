@@ -75,7 +75,7 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
-              <p>老师编号：<p th:text="${session.loginUser}"></p></p>
+              <p>老师编号：[[${session.loginUser}]]</p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
@@ -95,15 +95,18 @@
           <br>
           <div >
             <h1 class="h4" align="center">所管理课程</h1>
-            <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>课程编号</td><td>课程名称</td><td>操作</td></tr>
+            <table class="table table-hover table-bordered" border="1"align="center">
+              <thead><tr class="font"><td>课程编号</td><td>课程名称</td><td>操作</td></tr></thead>
+              <tbody>
               <tr th:each="c:${courses}">
                 <td th:text="${c.getCid()}"></td>
                 <td th:text="${c.getCourse()}"></td>
-                <td><a th:href="@{/teachers/course/{cid}(cid=${c.getCid()})}">课程管理</a>
-                    <a th:href="@{/teachers/course_students/{cid}(cid=${c.getCid()})}">学生管理</a>
+                <td><a th:href="@{/teachers/course/{cid}(cid=${c.getCid()})}" class="btn btn-info">课程管理</a>
+                    <a th:href="@{/teachers/course_students/{cid}(cid=${c.getCid()})}" class="btn btn-info">学生管理</a>
+                    <a th:href="@{/teachers/course_qiandao/{cid}(cid=${c.getCid()})}" class="btn btn-info">签到系统</a>
                 </td>
               </tr>
+              </tbody>
             </table>
           </div>
           <style type="text/css">

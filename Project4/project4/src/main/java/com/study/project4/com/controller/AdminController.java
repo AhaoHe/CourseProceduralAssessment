@@ -9,12 +9,11 @@ import com.study.project4.com.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class AdminController {
@@ -93,17 +92,63 @@ public class AdminController {
         adminService.deleteStu(id);
         return "redirect:/Admin/students";
     }
+    //删除学生men信息
+    @PostMapping("/Admin/deleteSs")
+    @ResponseBody
+    public String deleteStudents(@RequestParam("delitems")String delitems){
+        String[] strs = delitems.split(",");
+        for (int i = 0; i < strs.length; i++) {
+            try {
+                int id = Integer.parseInt(strs[i]);
+                adminService.deleteStu(id);
+            } catch (Exception e) {
+            }
+        }
+        return "成功";
+        //return "redirect:/Admin/students";
+    }
     //删除老师信息
     @GetMapping("/Admin/deleteT/{id}")
     public String deleteTeacher(@PathVariable("id") Integer id){
         adminService.deleteTeacher(id);
         return "redirect:/Admin/teachers";
     }
+    //删除教师men信息
+    @PostMapping("/Admin/deleteTs")
+    @ResponseBody
+    public String deleteTeachers(@RequestParam("delitems")String delitems){
+        String[] strs = delitems.split(",");
+        for (int i = 0; i < strs.length; i++) {
+            try {
+                int id = Integer.parseInt(strs[i]);
+                adminService.deleteTeacher(id);
+            } catch (Exception e) {
+            }
+        }
+        return "成功";
+    }
     //删除课程信息
     @GetMapping("/Admin/deleteC/{id}")
     public String deleteCourse(@PathVariable("id") Integer id){
         adminService.deleteCourse(id);
         return "redirect:/adminMain";
+    }
+    //删除课程men信息
+    @RequestMapping("/Admin/deleteCs")
+    @ResponseBody
+    public Map<String,Object> deleteCourses(@RequestParam("delitems")String delitems){
+        Map<String,Object> msg=new HashMap<String, Object>();
+        msg.put("msg","成功");
+        String[] strs = delitems.split(",");
+        for (int i = 0; i < strs.length; i++) {
+            try {
+                int id = Integer.parseInt(strs[i]);
+                adminService.deleteCourse(id);
+            } catch (Exception e) {
+            }
+        }
+        return msg;
+        //return "redirect:/adminMain";
     }
 
     //删除班级信息

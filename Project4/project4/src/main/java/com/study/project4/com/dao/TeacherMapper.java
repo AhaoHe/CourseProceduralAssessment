@@ -58,6 +58,14 @@ public interface TeacherMapper {
 //添加老师
     public int addTeacher(Teacher teacher);
 
-    //查询某门课某个学生的成绩
+    //更改签到情况 ifqiandao=0为未开启签到，=1开启签到，=3开启迟到模式
+    @Update("UPDATE course SET ifqiandao=#{sum} WHERE cid=#{cid}")
+    public int updateQiandao(@Param("cid") Integer cid,
+                             @Param("sum") String sum);
+
+    //添加学生签到情况
+    @Update("UPDATE course_students SET arrived=#{sum} WHERE cid=#{cid}")
+    public int updateStuQiandao(@Param("cid") Integer cid,
+                                @Param("sum") String sum);
 
 }

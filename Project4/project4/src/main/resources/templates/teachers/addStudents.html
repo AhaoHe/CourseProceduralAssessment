@@ -75,7 +75,7 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
-              <p>老师编号：<p th:text="${session.loginUser}"></p></p>
+              <p>老师编号：[[${session.loginUser}]]</p></p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
@@ -93,8 +93,9 @@
             </div>
           </header>
           <div >
-            <table class="imagetable" border="1"align="center">
-              <tr class="font"><td>申请课程ID</td><td>申请课程名称</td><td>学生ID</td><td>学生姓名</td><td>班级</td><td>性别</td><td>操作</td></tr>
+            <table class="table table-hover table-bordered" border="1"align="center">
+              <thead><tr class="font"><td>申请课程ID</td><td>申请课程名称</td><td>学生ID</td><td>学生姓名</td><td>班级</td><td>性别</td><td>操作</td></tr></thead>
+              <tbody>
               <tr th:each="s:${stuadd}">
                   <td th:text="${s.getCourse().getCid()}"></td>
                   <td th:text="${s.getCourse().getCourse()}"></td>
@@ -109,15 +110,16 @@
                     <input style="display: none;" name="Cid" th:value="${s.getCourse().getCid()}">
                     <input style="display: none;" name="Sid" th:value="${s.getStudent().getId()}">-->
                     <a th:href="@{/teachers/allowStu/{Cid}/{Sid}/{x}
-                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()},x=1)}">通过</a>
+                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()},x=1)}" class="btn btn-info">通过</a>
                   &nbsp;
                   <!--<form th:action="@{/teachers/refuseStu}">
                     <input style="display: none;" name="Cid" th:value="${s.getCourse().getCid()}">
                     <input style="display: none;" name="Sid" th:value="${s.getStudent().getId()}">-->
                     <a th:href="@{/teachers/refuseStu/{Cid}/{Sid}
-                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()})}">拒绝</a>
+                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()})}" class="btn btn-danger">拒绝</a>
                 </td>
               </tr>
+              </tbody>
             </table>
             <div style="text-align: center">
               <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->

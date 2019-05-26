@@ -30,11 +30,23 @@ public class StudentService {
     }
 
     //查询某个人某门课成绩
+    //查询某个人某门课签到信息
     public Course_Students getScores(int cid,int id){
         return studentsMapper.getScoresByCidandId(cid,id);
     }
+
     //查询某门课的成绩
     public List<Course_Students> getScoresAll(int cid){
         return  studentsMapper.getScoresByCid(cid);
+    }
+
+    //得到某门课总人数
+    public int getCourse_Count(int cid){
+        return studentsMapper.getCourse_CountByCid(cid);
+    }
+
+    //修改签到信息
+    public int updateArrived(String sum,int cid,int id){
+        return studentsMapper.updateArrived(sum, cid, id);
     }
 }

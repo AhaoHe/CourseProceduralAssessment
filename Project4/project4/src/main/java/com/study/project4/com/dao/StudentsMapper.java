@@ -40,11 +40,26 @@ public interface StudentsMapper {
     @Select("SELECT * FROM classname GROUP BY classid")
     public  List<ClassName> getClassName();
 
-    //查询某个人某门课成绩
+    //查询某个人某门课成绩/签到情况
     @Select("SELECT * FROM course_students WHERE cid=#{cid} AND id=#{id}")
     public Course_Students getScoresByCidandId(@Param("cid")int cid,
                                                @Param("id")int id);
-    //查询某门课成绩
+    //查询某门课成绩/签到情况
     @Select("SELECT * FROM course_students WHERE cid=#{cid} ORDER By id asc")
+    @Results({
+            @Result(column = "id", property = "student",javaType = Student.class,
+                    one = @One(select = "com.study.project4.com.dao.StudentsMapper.getStuByid"))
+    })
     public List<Course_Students> getScoresByCid(int cid);
+
+    //查询某门课总人数
+    @Select("SELECT count(*) FROM course_students WHERE cid=#{cid}")
+    public int getCourse_CountByCid(int cid);
+
+
+    //更改签到信息
+    @Update("UPDATE course_students SET arrived=#{sum} WHERE cid=#{cid} AND id=#{id}")
+    public int updateArrived(@Param("sum")String sum,
+                             @Param("cid")int cid,
+                             @Param("id")int id);
 }
