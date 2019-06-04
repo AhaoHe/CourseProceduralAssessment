@@ -34,7 +34,7 @@
           <div class="search-box">
             <button class="dismiss"><i class="icon-close"></i></button>
             <form id="searchForm" action="#" role="search">
-              <input type="search" placeholder="What are you looking for..." class="form-control">
+              <input type="search"  id="myInput" onkeyup="myFunction();" placeholder="What are you looking for...(通过id搜索)"  class="form-control">
             </form>
           </div>
           <div class="container-fluid">
@@ -95,6 +95,8 @@
               <button type="button" class="btn btn-info"
                       data-toggle="modal" data-target="#addModal">添加学生</button>
               <button type="button" class="btn btn-danger" id="delCousers" onclick="delStudents();">批量删除</button>
+              <button type="button" class="btn btn-info"
+                      data-toggle="modal" data-target="#excelModal">excel导入学生</button>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
@@ -103,8 +105,8 @@
             <table id="table" class="table table-hover table-bordered" border="1"align="center">
              <thead>
               <tr class="font">
-                <td><input type="checkbox" name="items" onclick="checkAll(this)"> 全选</td>
-                <td>学号</td><td>学生姓名</td><td>性别</td><td>班级</td><td>操作</td></tr>
+                <th><input type="checkbox" name="items" onclick="checkAll(this)"> 全选</th>
+                <th>学号</th><th>学生姓名</th><th>性别</th><th>班级</th><th>操作</th></tr>
              </thead>
              <tbody>
               <tr th:each="s,sState:${students}">
@@ -118,7 +120,7 @@
 
                 <td th:text="${s.getClassName().getClassname()}"></td>
                 <td>
-                  <a th:href="@{/Admin/deleteS/{id}(id=${s.getId()})}" class="btn btn-danger">删除</a>
+                  <a th:href="@{/Admin/deleteS/{id}/{pageNum}(id=${s.getId()},pageNum=${page.pageNum})}" class="btn btn-danger">删除</a>
                   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal"
                           onclick="editInfo(this)" th:id="${sState.index+1}">编辑</button>
                 </td>
@@ -126,10 +128,23 @@
              </tbody>
             </table>
           </div>
+          <div style="text-align: center">
+            <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->
+            <div th:if="${page.pageNum - 1 > 0}" style="display: inline-block;">
+              <a th:href="@{'?start='+${page.pageNum - 1}}" >[上一页]</a>
+            </div>
+            <div th:if="${page.pageNum +1 < page.pages +1}" style="display: inline-block;">
+              <a th:href="@{'?start='+${page.pageNum + 1}}" >[下一页]</a>
+            </div>
+            <a th:href="@{'?start='+${page.pages}}" style="display: inline-block;">[末  页]</a>
+          </div>
+          <div align="center">
+            当前页/总页数：<a th:href="@{'?start='+${page.pageNum}}" th:text="${page.pageNum}"></a>/<a th:href="@{'?start='+${page.pages}}" th:text="${page.pages}"></a>
+          </div>
 
 
 
-
+<!--编辑学生信息-->
           <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -143,6 +158,9 @@
                   </button>
                 </div>
                 <form th:action="@{/Admin/updateStu}" method="post">
+
+                  <input type="hidden" class="form-control" id="pageNum" name="pageNum" th:value="${page.pageNum}" readonly="true">
+
                   <div class="modal-body">
                     <div class="form-group">
                       <label for="StuId" class="col-sm-3 control-label">学生ID</label>
@@ -203,86 +221,8 @@
 
 
 
-          <script language='javascript' th:inline="javascript">
-              // 编辑课程
-              function editInfo(obj) {
-                  var id=$(obj).attr("id");
-                  var sid=document.getElementById("table").rows[id].cells[0].innerText;
-                  var sname = document.getElementById("table").rows[id].cells[1].innerText;
-                  var ssex = document.getElementById("table").rows[id].cells[2].innerText;
-                  var sclass = document.getElementById("table").rows[id].cells[3].innerText;
-                  var classname=document.getElementById("classid");
 
-                  $.each([[${students}]][id-1],function(key,value){
-                      if(key=="spsw") {
-                          var spswd=value;
-                          $('#spswd').val(spswd);
-                      }
-                  });
-
-
-                  $('#StuId').val(sid);
-                  $('#sname').val(sname);
-
-                  for (var i=0;i<classname.length;i++){
-                      if (classname.options[i].text==sclass){
-                          classname.options[i].selected = true;
-                      }
-                  }
-
-                  if (ssex == '女') {
-                      document.getElementById('women').checked = true;
-                  } else {
-                      document.getElementById('man').checked = true;
-                  }
-
-              }
-
-              //全选课程
-              function checkAll(c) {
-                  var status = c.checked;
-                  var oItems = document.getElementsByName('item');
-                  for(var i=0;i<oItems.length;i++){
-                      oItems[i].checked=status;
-                  }
-              }
-
-
-              //删除所有选中
-              function delStudents() {
-                  /*<![CDATA[*/
-                  //判断至少写了一项
-                  var checkedNum = $("input[name='item']:checked").length;
-                  if(checkedNum==0){
-                      alert("请至少选择一项!");
-                      return false;
-                  }
-                  if(confirm("确定删除所选项目?")) {
-                      var checkedList = new Array();
-                      var delsUrl = /*[[@{/Admin/deleteSs}]]*/;//获取动作地址
-                      $("input[name='item']:checked").each(function () {
-                          checkedList.push($(this).val());
-                      });
-                      $.ajax({
-                          type: "POST",
-                          url: delsUrl,
-                          data: {
-                              "delitems": checkedList.toString()
-                          },
-                          datatype: 'json',
-                          success: function (data) {
-                              location.reload();//页面刷新
-                          },
-                          error: function (data) {
-                              art.dialog.tips('删除失败!');
-                          }
-                      });
-                  }
-                  /*]]>*/
-              }
-          </script>
-
-
+<!--添加学生信息-->
           <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -349,6 +289,51 @@
           </div>
 
 
+          <!--excel文件上传-->
+          <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="excelModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="excelModalLabel">
+                    上传学生信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form class="form form-horizontal" id="form-article-add" enctype="multipart/form-data">
+                  <div class="modal-body">
+
+                    <div class="form-group">
+                      <label>请选择你要导入的excel文件(.xlsx)：</label>
+                      <div class="col-sm-9">
+                        <input type="file" multiple name="file" class="input-file" id="file">
+                      </div>
+                      
+                    </div>
+
+
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" onclick="importExcel();" class="btn btn-primary">
+                      导入数据
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
 
 
 
@@ -381,6 +366,19 @@
               border-style: solid;
               border-color: #999999;
             }
+
+            /*上传进度*/
+            #fatherDiv{
+              width:100px;
+              height:20px;
+              border:1px solid green;
+            }
+            #sonDiv{
+              width:0px;
+              height:20px;
+              background:green;
+            }
+
           </style>
 
           <!-- Page Footer-->
@@ -404,7 +402,138 @@
     <script th:src="@{/static/vendor/chart.js/Chart.min.js}"></script>
     <script th:src="@{/static/vendor/jquery-validation/jquery.validate.min.js}"></script>
     <script th:src="@{/static/js/charts-home.js}"></script>
+    <script th:src="@{/static/js/findFunction.js}"></script><!--搜索功能-->
     <!-- Main File-->
     <script th:src="@{/static/js/front.js}"></script>
+
+
+    <script language='javascript' th:inline="javascript">
+        // 编辑课程
+        function editInfo(obj) {
+            var id=$(obj).attr("id");
+            var sid=document.getElementById("table").rows[id].cells[1].innerText;
+            var sname = document.getElementById("table").rows[id].cells[2].innerText;
+            var ssex = document.getElementById("table").rows[id].cells[3].innerText;
+            var sclass = document.getElementById("table").rows[id].cells[4].innerText;
+            var classname=document.getElementById("classid");
+
+            $.each([[${students}]][id-1],function(key,value){
+                if(key=="spsw") {
+                    var spswd=value;
+                    $('#spswd').val(spswd);
+                }
+            });
+
+
+            $('#StuId').val(sid);
+            $('#sname').val(sname);
+
+            for (var i=0;i<classname.length;i++){
+                if (classname.options[i].text==sclass){
+                    classname.options[i].selected = true;
+                }
+            }
+
+            if (ssex == '女') {
+                document.getElementById('women').checked = true;
+            } else {
+                document.getElementById('man').checked = true;
+            }
+
+        }
+
+        //全选课程
+        function checkAll(c) {
+            var status = c.checked;
+            var oItems = document.getElementsByName('item');
+            for(var i=0;i<oItems.length;i++){
+                oItems[i].checked=status;
+            }
+        }
+
+
+        //删除所有选中
+        function delStudents() {
+            /*<![CDATA[*/
+            //判断至少写了一项
+            var checkedNum = $("input[name='item']:checked").length;
+            if(checkedNum==0){
+                alert("请至少选择一项!");
+                return false;
+            }
+            if(confirm("确定删除所选项目?")) {
+                var checkedList = new Array();
+                var delsUrl = /*[[@{/Admin/deleteSs}]]*/;//获取动作地址
+                $("input[name='item']:checked").each(function () {
+                    checkedList.push($(this).val());
+                });
+                $.ajax({
+                    type: "POST",
+                    url: delsUrl,
+                    data: {
+                        "delitems": checkedList.toString()
+                    },
+                    datatype: 'json',
+                    success: function (data) {
+                        location.reload(document.URL+"?start="+[[${page.pageNum}]]);//页面刷新
+                    },
+                    error: function (data) {
+                        art.dialog.tips('删除失败!');
+                    }
+                });
+            }
+
+        }
+
+
+        /*导入excel数据*/
+       function  importExcel()  {
+            //var clientid = $("#clientid").val();
+            var FormDatas=new FormData($("#form-article-add")[0]);
+            var fileName=$("#file").val();
+            if(fileName == '') {
+                alert("请选择文件！");
+                return false;
+            }
+            //验证文件格式
+            var fileType = (fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length)).toLowerCase();
+            if (fileType != 'xlsx') {
+                alert("文件格式不正确");
+                return false;
+            }
+           var excelUrl = /*[[@{/Admin/importExcel}]]*/;//获取动作地址
+
+           $.ajax({
+                type:'post',
+                url:excelUrl,
+                async : false,
+                cache : false,
+                contentType : false,
+                processData : false,
+                data:FormDatas,
+                success: function(data){
+                    if(data == "success"){
+                        alert("数据导入成功！");
+                        window.location.reload();
+                        return false;
+                    }else if(data=="error"){
+                        alert("工作表名字需要为'学生信息'");
+                        return false;
+                    }else {
+                        alert(data);
+                        return false;
+                    }
+                },
+                error : function(data){
+                    alert(data);
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+
+
+
   </body>
 </html>

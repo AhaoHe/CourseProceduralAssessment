@@ -40,12 +40,13 @@ public interface StudentsMapper {
     @Select("SELECT * FROM classname GROUP BY classid")
     public  List<ClassName> getClassName();
 
-    //查询某个人某门课成绩/签到情况
+    //查询某个人某门课成绩/签到情况/ifjoin是否添加课程
     @Select("SELECT * FROM course_students WHERE cid=#{cid} AND id=#{id}")
     public Course_Students getScoresByCidandId(@Param("cid")int cid,
                                                @Param("id")int id);
     //查询某门课成绩/签到情况
-    @Select("SELECT * FROM course_students WHERE cid=#{cid} ORDER By id asc")
+    //!!!!!查询某门课有哪些学生（跟CourseMapper里面的COURSE_STUDENTS类似）（前期功力不足，COURSE_STUDENTS写的太麻烦了）
+    @Select("SELECT * FROM course_students WHERE cid=#{cid} AND ifjoin IN (2,3) ORDER By id asc")
     @Results({
             @Result(column = "id", property = "student",javaType = Student.class,
                     one = @One(select = "com.study.project4.com.dao.StudentsMapper.getStuByid"))
@@ -53,7 +54,7 @@ public interface StudentsMapper {
     public List<Course_Students> getScoresByCid(int cid);
 
     //查询某门课总人数
-    @Select("SELECT count(*) FROM course_students WHERE cid=#{cid}")
+    @Select("SELECT count(*) FROM course_students WHERE cid=#{cid} AND ifjoin in (2,3)")
     public int getCourse_CountByCid(int cid);
 
 

@@ -38,10 +38,12 @@ public interface TeacherMapper {
     public List<Course_Students> getaddStuByTid(Integer tid);
 
 //允许学生添加课程  //撤回删除某门课的某个学生  //管理员拒绝删除某门课的某个学生
+//将ifjoin变为2  即正常状态
     @Update("UPDATE course_students SET ifjoin=2 WHERE cid=#{cid} AND id=#{id}")
     public int allowStudents(@Param("cid") Integer cid,
                              @Param("id") Integer id);
 //拒绝学生  //管理员同意删除某个学生
+    //将这行信息删除掉
     @Delete("DELETE FROM course_students WHERE cid=#{cid} AND id=#{id}")
     public  int refuseStudents(@Param("cid") Integer cid,
                                @Param("id") Integer id);
@@ -58,14 +60,21 @@ public interface TeacherMapper {
 //添加老师
     public int addTeacher(Teacher teacher);
 
-    //更改签到情况 ifqiandao=0为未开启签到，=1开启签到，=3开启迟到模式
+    //更改签到模式 ifqiandao=0为未开启签到，=1开启签到，=3开启迟到模式
     @Update("UPDATE course SET ifqiandao=#{sum} WHERE cid=#{cid}")
     public int updateQiandao(@Param("cid") Integer cid,
                              @Param("sum") String sum);
 
-    //添加学生签到情况
-    @Update("UPDATE course_students SET arrived=#{sum} WHERE cid=#{cid}")
-    public int updateStuQiandao(@Param("cid") Integer cid,
-                                @Param("sum") String sum);
+
+    //修改是否允许课程申请,x=1允许申请，x=0拒绝申请
+    @Update("UPDATE course SET open=#{x} WHERE cid=#{cid}")
+    public int updateOpen(@Param("cid") Integer cid,
+                          @Param("x") int x);
+
+    //修改课程介绍
+    @Update("UPDATE course SET information=#{information},type=#{type} WHERE cid=#{cid}")
+    public int editInformation(@Param("cid") Integer cid,
+                          @Param("information") String information,
+                          @Param("type") String type);
 
 }

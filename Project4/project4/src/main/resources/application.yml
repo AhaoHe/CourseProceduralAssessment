@@ -25,6 +25,7 @@ spring:
     poolPreparedStatements: true
     maxPoolPreparedStatementPerConnectionSize: 20
 
+
 ahaohe:
   title: 工程实践4-API文档
   description: API-swagger框架
@@ -45,3 +46,4 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countSql
+

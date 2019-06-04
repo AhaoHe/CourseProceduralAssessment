@@ -17,7 +17,8 @@ public interface CourseMapper {
     //通过id学生查询课程信息
     @Select("SELECT c.* " +
             "FROM course c,course_students cs,teacher t " +
-            "WHERE cs.id=#{id} AND cs.ifjoin=2 AND cs.cid=c.cid AND t.tid=c.tid")
+            "WHERE cs.id=#{id} AND cs.ifjoin=2 AND cs.cid=c.cid AND t.tid=c.tid " +
+            "ORDER BY c.cid ASC")
     @Results({
             @Result(column = "tid", property = "teacher",javaType = Teacher.class,
                     one = @One(select = "com.study.project4.com.dao.TeacherMapper.getTeacherById"))
@@ -44,6 +45,8 @@ public interface CourseMapper {
     public List<Course> getIfJoinById(Integer id);
 
     //通过课程id查询课程信息
+    //end=0表示在上课，end=2表示申请结课，end=3表示申请恢复课程，end=1表示结课
+    //socres组成：a,b,c,d   ——a表示迟到扣分情况，b表示缺勤扣分情况，c表示
     @Select("SELECT * FROM course WHERE cid=#{cid}")
     public Course getCourseByCid(Integer cid);
 
@@ -67,6 +70,17 @@ public interface CourseMapper {
     })
     public List<Course_Students> COURSE_STUDENTS(Integer cid);
 
+
+    //真·查询所有学生，不管是申请中还是请求删除的
+    @Select("SELECT * FROM course_students WHERE cid=#{cid} ORDER By id asc")
+    @Results({
+            @Result(column = "id", property = "student",javaType = Student.class,
+                    one = @One(select = "com.study.project4.com.dao.StudentsMapper.getStuByid")),
+            @Result(column = "cid", property = "course",javaType = Course.class,
+                    one = @One(select = "com.study.project4.com.dao.CourseMapper.getCourseByCid"))
+    })
+    public List<Course_Students> getStudentsAllByCid(int cid);
+
     //修改或者删除章节
     @Update("UPDATE course SET chapters=#{chapters} WHERE cid=#{cid}")
     public int UpdateandDelChapters(@Param("chapters") String chapters,
@@ -77,6 +91,11 @@ public interface CourseMapper {
     public int UpdateandDelScores(@Param("scores") String scores,
                                   @Param("cid") int cid,
                                   @Param("id") int id);
+
+    //修改或者删除难度
+    @Update("UPDATE course SET hardness=#{hardness} WHERE cid=#{cid}")
+    public int UpdateandDelHardness(@Param("hardness") String hardness,
+                                    @Param("cid") int cid);
 
 
 }

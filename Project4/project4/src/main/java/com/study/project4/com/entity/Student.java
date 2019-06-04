@@ -4,16 +4,8 @@ public class Student {
     int id;
     String sname;
     String spsw;
-    ClassName className;
     int ssex;
-
-    public int getSsex() {
-        return ssex;
-    }
-
-    public void setSsex(int ssex) {
-        this.ssex = ssex;
-    }
+    ClassName className;
 
     public int getId() {
         return id;
@@ -31,6 +23,22 @@ public class Student {
         this.sname = sname;
     }
 
+    public String getSpsw() {
+        return spsw;
+    }
+
+    public void setSpsw(String spsw) {
+        this.spsw = spsw;
+    }
+
+    public int getSsex() {
+        return ssex;
+    }
+
+    public void setSsex(int ssex) {
+        this.ssex = ssex;
+    }
+
     public ClassName getClassName() {
         return className;
     }
@@ -39,11 +47,14 @@ public class Student {
         this.className = className;
     }
 
-    public String getSpsw() {
-        return spsw;
-    }
-
-    public void setSpsw(String spsw) {
-        this.spsw = spsw;
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", 学生姓名='" + sname + '\'' +
+                ", 密码='" + spsw + '\'' +
+                ", 性别=" + ssex +
+                ", classID=" + className.getClassid() +
+                '}';
     }
 }

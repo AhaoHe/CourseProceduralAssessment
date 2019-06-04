@@ -100,17 +100,21 @@
             <h1 class="h4" align="center">所有课程</h1>
             <table class="table table-hover table-bordered" border="1"align="center">
 
-              <thead><tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>老师性别</th><th>操作</th></tr></thead>
+              <thead align="center"><tr class="font">
+                <th style="width: 15%">课程编号</th><th style="width: 15%">课程介绍</th><th style="width: 20%">课程名称</th><th style="width: 15%">老师名称</th><th style="width: 10%">老师性别</th><th style="width: 20%">操作</th>
+              </tr></thead>
               <!--<script type="text/javascript" th:inline="javascript">
                   /* <![CDATA[ */
                       var count;
                   /* ]]> */
               </script>-->
-              <tbody>
+              <tbody align="center">
               <tr th:each="c:${courses}">
                 <form th:action="@{/students/addCourse}">
-                  <input style="display: none;" name="Cid" th:value="${c.getCid()}">
+                  <input type="hidden" name="Cid" th:value="${c.getCid()}">
+                  <input type="hidden" name="pageNum" th:value="${page.pageNum}">
                   <td th:text="${c.getCid()}"></td>
+                  <td><button type="button" th:onclick="editInfo([[${c.getInformation()}]],[[${c.getType()}]])" class="btn btn-info" data-toggle="modal" data-target="#editModal">查看</button></td>
                   <td th:text="${c.getCourse()}"></td>
                   <td th:text="${c.getTeacher().getTname()}"></td>
 
@@ -118,10 +122,11 @@
                   <td th:if="${c.getTeacher().getTsex()==1}">男</td>
                   <td th:if="${c.getTeacher().getTsex()==0}">女</td>
 
-                  <td th:if="${c.getIfjoin()==2}" style="color: green;">已添加</td>
-                  <td th:if="${c.getIfjoin()==1}" style="color: red;">申请中</td>
-                  <td th:if="${c.getIfjoin()==3}" style="color: red;">退课中</td>
-                  <td th:if="${c.getIfjoin()==0}"><button type="submit" class="btn btn-info">申请</button></td>
+                  <td th:if="${c.getIfjoin()==2} and ${c.getOpen()==1}" style="color: green;">已添加</td>
+                  <td th:if="${c.getIfjoin()==1} and ${c.getOpen()==1}" style="color: red;">申请中</td>
+                  <td th:if="${c.getIfjoin()==3} and ${c.getOpen()==1}" style="color: red;">退课中</td>
+                  <td th:if="${c.getOpen()==0}" style="color: red;">已关闭申请</td>
+                  <td th:if="${c.getIfjoin()==0} and ${c.getOpen()==1}"><button type="submit" class="btn btn-info">申请</button></td>
                 </form>
                 <!--<div th:each="j:${ifjoin}">
                   <td th:if="${c.getCid()==j.getCid()&&j.getIfjoin()==2}" style="color: green;">已添加</td>
@@ -145,6 +150,70 @@
               当前页/总页数：<a href="?start=${page.pageNum}" th:text="${page.pageNum}"></a>/<a href="?start=${page.pages}" th:text="${page.pages}"></a>
             </div>
           </div>
+
+
+
+          <!--显示课程介绍-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="editModalLabel">
+                    课程介绍
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <div class="modal-body">
+
+                  <div class="form-group">
+                    <label for="type1" class="col-sm-3 control-label" style="color: blue">课程类型</label>
+                    <div class="col-sm-9">
+                      <input type="checkbox" id="type1" name="typeX" value="1" onclick="return false;"/> 考勤&nbsp;&nbsp;
+                      <input type="checkbox" id="type2" value="1" name="typeX" onclick="return false;"/> 作业&nbsp;&nbsp;
+                      <input type="checkbox" id="type3" value="1" name="typeX" onclick="return false;"/> 实验
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="information" class="col-sm-3 control-label">课程介绍</label>
+                    <div class="col-sm-9">
+                      <textarea type="text" class="form-control" id="information" name="information" readonly="true"></textarea>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+              function editInfo(information,type) {
+                  $("#information").val(information);
+                  var result=type.split(",");
+                  var boxes = document.getElementsByName("typeX");
+                  for(var i=0;i<boxes.length;i++){
+                      if(result[i]=="1"){
+                          boxes[i].checked=true;
+                      }else {
+                          boxes[i].checked=false;
+                      }
+                  }
+              }
+          </script>
+
           <style type="text/css">
             tr.font {
               font-size: 20px;

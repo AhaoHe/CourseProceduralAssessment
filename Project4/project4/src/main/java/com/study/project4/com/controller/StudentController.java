@@ -26,6 +26,7 @@ public class StudentController {
     @Autowired
     StudentService studentService=new StudentService();
 
+    //学生主页
     @RequestMapping("/studentMain")
     public String StudentMain(HttpSession session, Model model){
         Object stuId=session.getAttribute("loginUser");
@@ -35,6 +36,7 @@ public class StudentController {
         return "stumanag";
     }
 
+    //查询所有课程，并显示可以申请的课程
     @RequestMapping("/students/AllCourse")
     public String CoursesAll(Model model,
                              @RequestParam(value="start",defaultValue="0")int start,
@@ -57,20 +59,25 @@ public class StudentController {
             for (Course ifj:ifjoin){
                  if(course.getCid()==ifj.getCid()){
                     course.setIfjoin(ifj.getIfjoin());
-                }
+                 }
             }
         }
         model.addAttribute("courses",courses);
         return "students/courses";
     }
 
+    //申请课程
     @RequestMapping("/students/addCourse")
     public String addCourse(@RequestParam("Cid") Integer Cid,
+                            @RequestParam("pageNum") Integer pageNum,
                             HttpSession session){
-        Object stuId=session.getAttribute("loginUser");
-        int id= (int) stuId;
-        courseService.addIfjoin(Cid,id,1);
-        return "redirect:/students/AllCourse";
+        Course course=courseService.getCourseByCid(Cid);
+        if(course.getOpen()==1){
+            Object stuId=session.getAttribute("loginUser");
+            int id= (int) stuId;
+            courseService.addIfjoin(Cid,id,1);
+        }
+        return "redirect:/students/AllCourse"+"?start="+pageNum;
     }
 
 
@@ -86,22 +93,28 @@ public class StudentController {
         String[] c=chapters.split("\\|\\|");
         model.addAttribute("chapters",c);
 
+        //查询难度_重要性
+        String hardness=course.getHardness();
+        String[] h=hardness.split(",");
+        model.addAttribute("hardness",h);
+
         //查询成绩
         Course_Students cs=studentService.getScores(cid,id);
         String scores=cs.getScores();
         String[] s=scores.split("\\|\\|");
-        model.addAttribute("scores",s);
+
 
         //查询所有人的平时成绩
         List<Course_Students> course_students=studentService.getScoresAll(cid);
         List<String[]> list=new ArrayList<String[]>();
         int a[] = new int[c.length];//平均分的数组,代表每个章节的平均分
+        String courseAver[] = new String[c.length];
         int count[] = new int[c.length];
         for(Course_Students course_student:course_students) {
             String result = course_student.getScores();
             String[] rt = result.split("\\|\\|");
             for (int i=0;i<rt.length;i++){
-                if(!rt[i].equals("empty")) {
+                if(!rt[i].equals("empty")&&!rt[i].equals("")) {
                     int x = Integer.parseInt(rt[i]);
                     a[i] += x;
                     count[i]++;
@@ -115,20 +128,28 @@ public class StudentController {
         int sum=0;
         int isCount=0;
         for (int i=0;i<s.length;i++) {
-            if (!s[i].equals("empty")){
+            if (!s[i].equals("empty")&&!s[i].equals("")){
                 int x = Integer.parseInt(s[i]);
                 sum += x;
                 isCount++;
-            }
+            }/*else {
+                s[i]=null;
+            }*/
             if (count[i]!=0) {
                 a[i] /= count[i];//这门课每章节的平均成绩
+                courseAver[i]=String.valueOf(a[i]);
             }else {
-                a[i]=0;
+                courseAver[i]=null;
             }
         }
-        int aver=sum/isCount;
-        model.addAttribute("aver",aver);
-        model.addAttribute("CourseAver",a);
+        if (isCount!=0) {
+            int aver=sum/isCount;
+            model.addAttribute("aver",aver);
+        }
+
+        model.addAttribute("scores",s);//成绩
+
+        model.addAttribute("CourseAver",courseAver);
         model.addAttribute("cid",cid);
 
         return "students/grade";
@@ -142,7 +163,12 @@ public class StudentController {
         int id= (int) session.getAttribute("loginUser");
         Course_Students cs=studentService.getScores(cid,id);//查询签到信息
         String arrived=cs.getArrived();
-        String[] a=arrived.split(",");
+        String[] a;
+        if(!arrived.equals("")){
+            a=arrived.split(",");
+        }else {
+            a=null;
+        }
         model.addAttribute("arrived",a);
         model.addAttribute("CourseID",cid);
 

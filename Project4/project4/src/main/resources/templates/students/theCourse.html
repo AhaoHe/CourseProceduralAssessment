@@ -101,6 +101,7 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
+                    <li><a th:href="@{/students/StuScores/{cid}(cid=${CourseID})}"> </i>成绩 </a></li>
                     <li class="active"><a th:href="@{/students/checkArrived/{cid}(cid=${CourseID})}"> </i>签到 </a></li>
                     <li><a th:href="@{/students/AllCourse}"></i>上传作业 </a></li>
                     <li><a th:href="@{/studentMain}"> <i class="icon-interface-windows"></i>返回学生界面 </a></li>
@@ -123,7 +124,7 @@
               <thead><tr class="font"><th>签到序列</th><th>签到情况</th><th>操作</th></tr></thead>
               <tbody>
               <tr th:each="a,aState:${arrived}">
-                <td th:text="'第'+${aState.count}+'次签到'"></td>
+                <td th:if="${a}!=null" th:text="'第'+${aState.count}+'次签到'"></td>
 
                 <!--签到情况-->
                 <td th:if="${a.toString()}=='1'" th:text="已签到" style="color: green"></td>

@@ -40,10 +40,10 @@ public class AdminService {
         return adminMapper.deleteCourse(id);
     }
 
-    //查询哪门课有哪些老师要删除哪些学生
+    /*查询哪门课有哪些老师要删除哪些学生，已经被couseMapperl里的getStudentsAllbyCID淘汰了
     public List<Course_Students> findTeaDelStuAll(Integer cid){
         return adminMapper.findTeaDelStuAll(cid);
-    }
+    }*/
 
 
     //添加老师
@@ -87,6 +87,11 @@ public class AdminService {
     //修改班级信息
     public int updateClass(ClassName className){
         return adminMapper.updateClass(className);
+    }
+
+    //导入学生
+    public int importStudents(int cid,int id){
+        return adminMapper.importStudents(cid,id);
     }
 
 }

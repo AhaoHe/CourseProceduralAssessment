@@ -170,8 +170,8 @@
               // 编辑课程
               function editInfo(obj) {
                   var id=$(obj).attr("id");
-                  var classid=document.getElementById("table").rows[id].cells[0].innerText;
-                  var classname = document.getElementById("table").rows[id].cells[1].innerText;
+                  var classid=document.getElementById("table").rows[id].cells[1].innerText;
+                  var classname = document.getElementById("table").rows[id].cells[2].innerText;
 
                   $('#classId').val(classid);
                   $('#classname').val(classname);

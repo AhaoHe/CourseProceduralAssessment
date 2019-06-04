@@ -9,6 +9,7 @@
     <meta name="robots" content="all,follow">
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" th:href="@{/static/vendor/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/static/css/bootstrap-slider.css}">
     <!-- Font Awesome CSS-->
     <link rel="stylesheet" th:href="@{/static/vendor/font-awesome/css/font-awesome.min.css}">
     <!-- Fontastic Custom icon font-->
@@ -80,16 +81,16 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a th:href="@{/teacherMain}"> </i>我的信息 </a></li>
-                    <li><a th:href="@{/teachers/AllCourse}"></i>课程申请管理 </a></li>
-                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
+                    <li class="active"><a th:href="@{/teachers/course/{cid}(cid=${courseID})}"> </i>章节信息 </a></li>
+                    <li><a th:href="@{/teachers/grades/{cid}(cid=${courseID})}"></i>成绩情况 </a></li>
+                    <li><a th:href="@{/teacherMain}"> <i class="icon-interface-windows"></i>返回教师主页 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <a class="no-margin-bottom" style="margin-right: 80%;" th:href="@{/teacherMain}">返回</a>
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#informationModal" onclick="getCourse();">课程信息</button>
               <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addModal">添加章节</button>
             </div>
           </header>
@@ -98,19 +99,28 @@
 
           <div >
             <table id="table" class="table table-hover table-bordered" border="1" align="center">
-              <thead><tr class="font"><td>章节序列</td><td>章节名称</td><td>操作</td></tr></thead>
-              <tbody>
+              <thead align="center"><tr class="font"><th>章节序列</th><th style="width: 20%">章节名称</th><th>章节平均成绩</th><th>重要性</th><th>操作</th></tr></thead>
+              <tbody align="center">
               <tr th:each="c,cStat:${chapters}">
 
                 <td th:if="${c.toString()!=''}" th:text="${cStat.count}"></td>
 
                 <td th:if="${c.toString()!=''}" th:text="${c.toString()}"></td>
 
+                <span th:each="s,sStat:${sum}" th:if="${cStat.index}==${sStat.index}">
+                  <td  th:text="${s}"></td>
+                </span>
+                <span th:each="h,hStat:${hardness}" th:if="${cStat.index}==${hStat.index}">
+                  <td th:if="${h}!='-1'" th:text="${h}+'⭐'"></td>
+                  <td th:if="${h}=='-1'" th:text="未定义"></td>
+                </span>
+
                 <td th:if="${c.toString()!=''}">
                   <a class="btn btn-danger" th:href="@{/teachers/deleteChapter/{cid}/{id}
-                     (cid=${courseID},id=${cStat.index})}">删除</a>
+                     (cid=${courseID},id=${cStat.index})}" onclick="return sumbit_form();">删除</a>
                   <button th:id="${cStat.index+1}" onclick="editInfo(this)"
                      class="btn btn-info" data-toggle="modal" data-target="#editModal">修改</button>
+                  <button th:onclick="gradesInfo([[${cStat.index}]]);" class="btn btn-info" data-toggle="modal" data-target="#gradesModal">章节成绩情况</button>
                 </td>
               </tr>
               </tbody>
@@ -118,6 +128,228 @@
 
           </div>
 
+
+          <!--修改课程信息-->
+          <div class="modal fade" id="informationModal" tabindex="-1" role="dialog" aria-labelledby="informationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="informationModalLabel">
+                    课程信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <form th:action="@{/teachers/editInformation}" >
+                  <div class="modal-body">
+
+                    <input type="hidden" class="form-control" id="cid" name="cid" th:value="${courseID}" readonly="true">
+
+                    <div id="testX">
+                      <input type="range"  id="slider" min="1" max="99" step="1" onchange="print();" />
+                      <span>考勤比重: <span id="print"></span>%</span>
+                    </div>
+
+                    <div id="testY">
+                      <input type="range"  id="slider1" min="1" max="99" step="1" onchange="print1();"/>
+                      <span>其他比重: <span id="print1"></span>%</span>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="type1" class="col-sm-3 control-label" style="color: blue">课程类型</label>
+                      <div class="col-sm-9">
+                        <input type="checkbox" id="type1" name="typeX" value="1" th:checked="${type[0]}!='0'" /> 考勤&nbsp;&nbsp;
+                        <input type="checkbox" id="type2" value="1" name="typeX" th:checked="${type[1]}!='0'"/> 作业&nbsp;&nbsp;
+                        <input type="checkbox" id="type3" value="1" name="typeX" th:checked="${type[2]}!='0'"/> 实验
+                        <input type="hidden" id="typeX" name="type" >
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="information" class="col-sm-3 control-label" style="color: blue">课程介绍</label>
+                      <div class="col-sm-9">
+                        <textarea type="text" class="form-control" id="information" name="information">[[${information}]]</textarea>
+                      </div>
+                    </div>
+
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="submit" class="btn btn-primary" onclick="editCourse();">
+                      更新
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+            function editCourse() {
+                var obj=document.getElementsByName("typeX");
+                var value=[];
+                for (var k=0;k<obj.length;k++){
+                    if (obj[k].checked){
+                        value.push(obj[k].value);
+                    }else{
+                        value.push("0");
+                    }
+                }
+                $("#typeX").val(value.toString());
+            }
+
+            var v1;
+            function getCourse() {
+                v1=$("#slider").val();//得到slider的值
+                var result=[[${type}]];
+                var boxes = document.getElementsByName("typeX");
+                for(var i=0;i<boxes.length;i++){
+                    if(result[i]=="1"){
+                        boxes[i].checked=true;
+                    }else {
+                        boxes[i].checked=false;
+                    }
+                }
+
+
+                //判断滑块是否显示
+                /*$("#type1").click(function () {
+                    if(this.checked){
+                        $('#testX').html("<input type=\"range\"  id=\"slider\" min=\"1\" max=\"99\" step=\"1\" value=\"50\" onchange=\"print();\" />\n" +
+                            "<span>考勤比重: <span id=\"print\">50</span>%</span>");
+                        $('#slider').val("50");
+                    }else {
+                        $('#testX').html("<input type=\"hidden\"  id=\"slider\" min=\"1\" max=\"99\" step=\"1\" value=\"50\" onchange=\"print();\" />");
+                    }
+                });
+                var html="<input type=\"range\"  id=\"slider1\" min=\"1\" max=\"99\" step=\"1\" value=\"50\" onchange=\"print1();\"/>\n" +
+                    "<span>其他比重: <span id=\"print1\">50</span>%</span>";
+
+
+                $("#type2").click(function () {
+                    if(boxes[1].checked||boxes[2].checked){
+                        $('#testY').html(html);
+                        $('#slider1').val(50);
+                    }else {
+                        $('#testY').html("");
+                    }
+                });
+                $("#type3").click(function () {
+                    if(boxes[1].checked||boxes[2].checked){
+                        $('#testY').html(html);
+                        $('#slider1').val(50);
+                    }else {
+                        $('#testY').html("");
+                    }
+                });*/
+
+                //考勤比重
+                $('#print').click(function(){
+                    if(!$(this).is('.input')){
+                        $(this).addClass('input').html('<input type="text" style="width: 40px" value="'+ $(this).text() +'" />').find('input').focus().blur(function(){//当点击后会给他一个
+                            var thisvalue=$(this).val();//获得值
+                            $(this).parent().removeClass('input').html($(this).val() || 0);
+                            if(Number(thisvalue)<100 && Number(thisvalue)>0){
+                                $("#slider").val($(this).val());
+                                $("#slider1").val(100-Number(thisvalue));
+                                $("#print1").text(100-Number(thisvalue));
+                            }else {
+                                alert("请输入1——99之间");
+                            }
+                        });
+                    }
+                })
+                //其他比重
+                $('#print1').click(function(){
+                    if(!$(this).is('.input')){
+                        $(this).addClass('input').html('<input type="text" style="width: 40px" value="'+ $(this).text() +'" />').find('input').focus().blur(function(){//当点击后会给他一个
+                            var thisvalue=$(this).val();//获得值
+                            $(this).parent().removeClass('input').html($(this).val() || 0);
+                            if(Number(thisvalue)<100 && Number(thisvalue)>0){
+                                $("#slider1").val(thisvalue);
+                                $("#slider").val(100-Number(thisvalue));
+                                $("#print").text(100-Number(thisvalue));
+                            }else {
+                                alert("请输入1——99之间");
+                            }
+                        });
+                    }
+                })
+
+
+
+                var html="<input type=\"range\"  id=\"slider\" min=\"1\" max=\"99\" step=\"1\" value='"+v1+"' onchange=\"print();\" />\n" +
+                    "<span>考勤比重: <span id=\"print\">"+v1+"</span>%</span>";
+                var htmlX="<input type=\"range\"  id=\"slider1\" min=\"1\" max=\"99\" step=\"1\" value='"+100-v1+"' onchange=\"print1();\"/>\n" +
+                    "<span>其他比重: <span id=\"print1\">"+100-v1+"</span>%</span>";
+                $("#type1").click(function clickBox(){
+                    if(boxes[0].checked){
+                        if(boxes[1].checked||boxes[2].checked){
+                            $('#testX').html(html);
+                            $('#testY').html(htmlX);
+                        }else {
+                            $('#testY').html("");
+                            $('#testX').html("");
+                        }
+                    }else {
+                        $('#testY').html("");
+                        $('#testX').html("");
+                    }
+                });
+
+            }
+
+
+            function clickBox(){
+                var boxes = document.getElementsByName("typeX");
+                var v1=$("#slider").val();
+                console.log(v1);
+                var html="<input type=\"range\"  id=\"slider\" min=\"1\" max=\"99\" step=\"1\" value='"+v1+"' onchange=\"print();\" />\n" +
+                    "<span>考勤比重: <span id=\"print\">"+v1+"</span>%</span>";
+                console.log(html);
+                if(boxes[0].checked){
+                    if(boxes[1].checked||boxes[2].checked){
+                        $('#testX').html(html);
+                    }else {
+                        $('#testY').html("");
+                        $('#testX').html("");
+                    }
+                }else {
+                    $('#testY').html("");
+                    $('#testX').html("");
+                }
+            }
+
+              //此函数用于显示滑块的当前值
+              function print(){
+                  //获取信息
+                  var value = parseFloat($("#slider").val());
+                  //将信息显示
+                  $("#print").text(value);
+                  $("#slider1").val(100-Number($("#slider").val()));
+                  $("#print1").text(100-Number($("#slider").val()));
+                  v1=$("#slider").val();
+              }
+              function print1(){
+                  //获取信息
+                  var value = parseFloat($("#slider1").val());
+                  //将信息显示
+                  $("#print1").text(value);
+                  $("#slider").val(100-Number($("#slider1").val()));
+                  $("#print").text(100-Number($("#slider1").val()));
+                  v1=$("#slider").val();
+              }
+
+          </script>
 
 
 
@@ -140,11 +372,37 @@
                     <input style="display: none" id="chapterId" name="chapterId">
 
                     <div class="form-group">
+                      5⭐非常重要：会影响整个课程学习，考试必考<br>
+                      4⭐重要：会影响下一章节学习<br>
+                      3⭐中等：后期频繁用到，但不影响章节学习<br>
+                      2⭐一般：遇到后知道是什么，如何使用<br>
+                      1⭐不重要：了解就行<br>
+                    </div>
+
+                    <div class="form-group">
                       <label for="chapterName" class="col-sm-3 control-label">章节名字</label>
                       <div class="col-sm-9">
                         <input type="text" class="form-control" id="cName" name="chapterName" placeholder="请输入章节名字">
                       </div>
                     </div>
+
+                    <div class="form-group">
+                      <label for="eidtpingStar" class="col-sm-3 control-label">重要性</label>
+                      <div class="col-sm-9">
+                        <div class="starts">
+                          <ul id = "eidtpingStar">
+                            <li rel = "1" title = "不重要"></li>
+                            <li rel = "2" title = "一般"></li>
+                            <li rel = "3" title = "中等"></li>
+                            <li rel = "4" title = "重要"></li>
+                            <li rel = "5" title = "非常重要"></li>
+                            <span id="editdir"></span>
+                          </ul>
+                          <input type="hidden" value="" id ="editstartP" name="startP"/>
+                        </div>
+                      </div>
+                    </div>
+
 
                   </div>
                   <div class="modal-footer">
@@ -165,15 +423,66 @@
             <!-- /.modal -->
           </div>
 
-          <script>
+          <script language='javascript' th:inline="javascript">
               // 编辑章节
               function editInfo(obj) {
                   var id=$(obj).attr("id");
                   var cname=document.getElementById("table").rows[id].cells[1].innerText;
 
+                  $('#editstartP').val([[${hardness}]][id-1]);
                   $('#cName').val(cname);
                   $('#chapterId').val(id-1);
 
+
+                  /*修改的星级评分*/
+                  var s = document.getElementById("eidtpingStar");
+                  var m = document.getElementById("editdir"),
+                      n = s.getElementsByTagName("li"),
+                      input = document.getElementById("editstartP");//保存所选值
+                  clearAll = function(){
+                      for(var i = 0;i < n.length;i++){
+                          n[i].className = "";
+                      }
+                  }
+                  for(var i = 0;i < n.length;i++){
+                      n[i].onclick = function(){
+                          var q = this.getAttribute("rel");
+                          clearAll();
+                          input.value = q;
+                          for(var i = 0;i < q;i++){
+                              n[i].className = "on";
+                          }
+                          m.innerHTML = this.getAttribute("title");
+                      }
+                      n[i].onmouseover = function(){
+                          var q = this.getAttribute("rel");
+                          clearAll();
+                          for(var i = 0;i < q;i++){
+                              n[i].className = "on";
+                          }
+                          m.innerHTML = this.getAttribute("title");
+                      }
+                      n[i].onmouseout = function(){
+                          clearAll();
+                          for(var i = 0;i < input.value;i++){
+                              n[i].className = "on";
+                          }
+
+                      }
+                  }
+
+              }
+
+
+
+              //删除保护
+              function sumbit_form(){
+                  var ifdel=confirm("是否真的删除?");
+                  if (ifdel==true){
+                      return true;
+                  }else{
+                      return false;
+                  }
               }
           </script>
 
@@ -196,6 +505,14 @@
                   <div class="modal-body">
 
                     <div class="form-group">
+                      5⭐非常重要：会影响整个课程学习，考试必考<br>
+                      4⭐重要：会影响下一章节学习<br>
+                      3⭐中等：后期频繁用到，但不影响章节学习<br>
+                      2⭐一般：遇到后知道是什么，如何使用<br>
+                      1⭐不重要：了解就行<br>
+                    </div>
+
+                    <div class="form-group">
                       <label for="chapterName" class="col-sm-3 control-label">章节名字</label>
                       <div class="col-sm-9">
                         <input type="text" class="form-control" id="chapterName" name="chapterName" placeholder="请输入章节名字">
@@ -206,6 +523,23 @@
                       <label for="chapterName" class="col-sm-3 control-label">初始成绩</label>
                       <div class="col-sm-9">
                         <input type="text" class="form-control" id="scores" name="scores" placeholder="请输入初始成绩,为空则无初始成绩">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pingStar" class="col-sm-3 control-label">重要性</label>
+                      <div class="col-sm-9">
+                        <div class="starts">
+                          <ul id = "pingStar">
+                            <li rel = "1" title = "不重要"></li>
+                            <li rel = "2" title = "一般"></li>
+                            <li rel = "3" title = "中等"></li>
+                            <li rel = "4" title = "重要"></li>
+                            <li rel = "5" title = "非常重要"></li>
+                            <span id="dir"></span>
+                          </ul>
+                          <input type="hidden" value="" id = "startP" name="startP"/>
+                        </div>
                       </div>
                     </div>
 
@@ -229,10 +563,185 @@
           </div>
 
 
+          <!--章节成绩情况-->
+          <div class="modal fade" id="gradesModal" tabindex="-1" role="dialog" aria-labelledby="gradesModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0;">
+              <div class="modal-content" style="position: absolute; top: 0; bottom: 0; width: 100%;">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="gradesModalLabel">
+                    成绩情况(只会改成绩)
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-right: 15px;">
+                    ×
+                  </button>
+                </div>
+                  <div class="modal-body" style="overflow-y: scroll; position: absolute; top: 55px; bottom: 65px; width: 100%;">
+                    <p>(红色表示不及格，黄色表示危险，绿色表示优秀)</p>
+                    <table class="table table-hover table-bordered" border="1"align="center">
+
+                      <thead>
+                      <tr><th>学生ID</th><th>姓名</th><th>班级</th><th>性别</th><th>成绩</th></tr>
+                      </thead>
+
+                      <tbody id="StuSocres">
+
+                      </tbody>
+
+                    </table>
+
+                  </div>
+                  <div class="modal-footer" style="position: absolute; width: 100%; bottom: 0;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="editScores">
+                      更新
+                    </button>
+                  </div>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+              // 展示学生成绩
+              function gradesInfo(id) {
+                  var list=[[${scores}]];
+                  var html="";
+                  var stuIDs=[list.length];
+                  var scores=[list.length];
+                  for (var i=0;i<list.length;i++){
+                      var s=list[i][4].split("||");
+                      stuIDs[i]=list[i][0];
+                      html += "<tr>";
+                      html +=     "<td>" + list[i][0] + "</td>"
+                      html +=     "<td>" + list[i][1] + "</td>"
+                      html +=     "<td>" + list[i][2] + "</td>"
+                      //判断男女
+                      if(list[i][3]=="1"){
+                          html +=     "<td>" + "男" + "</td>"
+                      }else {
+                          html +=     "<td>" + "女" + "</td>"
+                      }
+                      //判断成绩显示的颜色
+                      if(Number(s[id])>=95){
+                          html +=     "<td style='color: #39c764;'>" + s[id] + "</td>"
+                      }else if(Number(s[id])>=60 && Number(s[id])<=65){
+                          html +=     "<td style='color: #ffd811'>" + s[id] + "</td>"
+                      }else if(Number(s[id])<60){
+                          html +=     "<td style='color: red'>" + s[id] + "</td>"
+                      }else {
+                          html +=     "<td>" + s[id] + "</td>"
+                      }
+                      html += "</tr>";
+                  }
+                  //生成新表格
+                  $("#StuSocres").html(html);
+                  //生成新的标题
+                  var chapterName=document.getElementById("table").rows[id+1].cells[1].innerHTML;
+                  $("#gradesModalLabel").html(chapterName+"--成绩情况(只会改成绩)");
+
+                  var stuID=stuIDs.join(",");//生成学生id的字符串
+
+                  $('#StuSocres td').click(function(){
+                      if(!$(this).is('.input')){
+                          $(this).addClass('input').html('<input type="text" style="width: 55px;" value="'+ $(this).text() +'" />').find('input').focus().blur(function(){//当点击后会给他一个
+                              //var thisid = $(this).parent().siblings("th:eq(0)").text();//返回同行的0列元素，即id
+                              var thisvalue=$(this).val();//获得值
+                              //var thisclass = $(this).parent().attr("class");
+                              $(this).parent().removeClass('input').html($(this).val() || 0);
+                          });
+                      }
+                  })
+
+
+                  $('#editScores').unbind("click").bind("click",function(){//bind("click",function()相当于click(function()
+                      //$("#editScores").click(function(){ //必须加unbind("click")清除之前的点击事件
+                      for (var i=0;i<list.length;i++){
+                          scores[i]=document.getElementById("StuSocres").rows[i].cells[4].innerHTML;
+                      }
+                      var score=scores.join(",");//生成成绩的字符串
+                      /*<![CDATA[*/
+                      var addUrl = /*[[@{/teachers/updateChapterScores}]]*/;//获取动作地址
+                      /*]]>*/
+                      $.ajax({
+                          type: "POST",
+                          url: addUrl,
+                          async:true,
+                          dataType:'json',
+                          data: {
+                              "score": score,
+                              "cid": [[${courseID}]],
+                              "stuID": stuID,
+                              "index": id
+                          },
+                          success: function(data) {
+                              //$('#editScores').off('click');
+                              //$('#StuBtn').off('click');
+                              $('#gradesModal').modal('hide');
+                              alert(data.msg);
+                              location.reload();
+                          }
+                      });
+                  });
+
+              }
+
+
+
+              /*添加的星级评分*/
+              window.onload = function(){
+                  var s = document.getElementById("pingStar");
+                  var m = document.getElementById("dir"),
+                      n = s.getElementsByTagName("li"),
+                      input = document.getElementById("startP");//保存所选值
+                  clearAll = function(){
+                      for(var i = 0;i < n.length;i++){
+                          n[i].className = "";
+                      }
+                  }
+                  for(var i = 0;i < n.length;i++){
+                      n[i].onclick = function(){
+                          var q = this.getAttribute("rel");
+                          clearAll();
+                          input.value = q;
+                          for(var i = 0;i < q;i++){
+                              n[i].className = "on";
+                          }
+                          m.innerHTML = this.getAttribute("title");
+                      }
+                      n[i].onmouseover = function(){
+                          var q = this.getAttribute("rel");
+                          clearAll();
+                          for(var i = 0;i < q;i++){
+                              n[i].className = "on";
+                          }
+                          m.innerHTML = this.getAttribute("title");
+                      }
+                      n[i].onmouseout = function(){
+                          clearAll();
+                          for(var i = 0;i < input.value;i++){
+                              n[i].className = "on";
+                          }
+
+                      }
+                  }
+              }
+
+          </script>
+
+
           <style type="text/css">
-            button  {
-              background:#b5cfd2 url('css/bulecell.jpg');
-            }
+            /*.modal-dialog{position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
+            .modal-content{!*overflow-y: scroll; *! position: absolute; top: 0; bottom: 0; width: 100%;}
+            .modal-body{overflow-y: scroll; position: absolute; top: 55px; bottom: 65px; width: 100%;}
+            .modal-header .close{margin-right: 15px;}
+            .modal-footer{position: absolute; width: 100%; bottom: 0;}*/
+
             tr.font {
               font-size: 20px;
             }
@@ -258,6 +767,24 @@
               border-style: solid;
               border-color: #999999;
             }
+
+
+
+            /*星级评分*/
+
+            .starts ul li{
+              list-style: none;
+              width:32px;
+              height:21px;
+              float:left;
+              background:url(/static/img/stark2.png) no-repeat;
+
+            }
+            .starts ul li.on{
+              background:url(/static/img/stars2.png) no-repeat;
+            }
+
+
           </style>
 
           <!-- Page Footer-->
@@ -281,6 +808,8 @@
     <script th:src="@{/static/vendor/chart.js/Chart.min.js}"></script>
     <script th:src="@{/static/vendor/jquery-validation/jquery.validate.min.js}"></script>
     <script th:src="@{/static/js/charts-home.js}"></script>
+    <script th:src="@{/static/js/bootstrap-slider.js}"></script>
+    <script th:src="@{/static/js/bootstrap-slider.min.js}"></script>
     <!-- Main File-->
     <script th:src="@{/static/js/front.js}"></script>
   </body>

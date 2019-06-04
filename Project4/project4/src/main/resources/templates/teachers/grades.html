@@ -24,6 +24,7 @@
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+    <script th:src="@{/static/js/echarts.min.js}"></script>
   </head>
   <body>
     <div class="page">
@@ -75,66 +76,106 @@
             <div class="avatar"><img th:src="@{/static/img/avatar-1.jpg}" alt="..." class="img-fluid rounded-circle"></div>
             <div class="title">
               <h1 class="h4" th:text="${session.Main.getTname()}"></h1>
-              <p>老师编号：[[${session.loginUser}]]</p></p>
+              <p>老师编号：[[${session.loginUser}]]</p>
             </div>
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li><a th:href="@{/teacherMain}"> </i>我的信息 </a></li>
-                    <li class="active"><a th:href="@{/teachers/AllCourse}"></i>课程申请管理 </a></li>
-                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
+                    <li><a th:href="@{/teachers/course/{cid}(cid=${courseID})}"> </i>章节信息 </a></li>
+                    <li class="active"><a th:href="@{/teachers/grades/{cid}(cid=${courseID})}"></i>成绩情况 </a></li>
+                    <li><a th:href="@{/teacherMain}"> <i class="icon-interface-windows"></i>返回教师主页 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <h2 class="no-margin-bottom">课程过程化>课程管理</h2>
+              [[${cname}]]
             </div>
           </header>
-          <div >
-            <table class="table table-hover table-bordered" border="1"align="center">
-              <thead><tr class="font"><td>申请课程ID</td><td>申请课程名称</td><td>学生ID</td><td>学生姓名</td><td>班级</td><td>性别</td><td>操作</td></tr></thead>
-              <tbody>
-              <tr th:each="s:${stuadd}">
-                  <td th:text="${s.getCourse().getCid()}"></td>
-                  <td th:text="${s.getCourse().getCourse()}"></td>
-                  <td th:text="${s.getStudent().getId()}"></td>
-                  <td th:text="${s.getStudent().getSname()}"></td>
-                  <td th:text="${s.getStudent().getClassName().getClassname()}"></td>
-                  <!-- 判断男女 -->
-                  <td th:if="${s.getStudent().getSsex()==1}">男</td>
-                  <td th:if="${s.getStudent().getSsex()==0}">女</td>
-                <td>
-                  <!--<form th:action="@{/teachers/allowStu}">
-                    <input style="display: none;" name="Cid" th:value="${s.getCourse().getCid()}">
-                    <input style="display: none;" name="Sid" th:value="${s.getStudent().getId()}">-->
-                    <a th:href="@{/teachers/allowStu/{Cid}/{Sid}
-                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()})}" class="btn btn-info">通过</a>
-                  &nbsp;
-                  <!--<form th:action="@{/teachers/refuseStu}">
-                    <input style="display: none;" name="Cid" th:value="${s.getCourse().getCid()}">
-                    <input style="display: none;" name="Sid" th:value="${s.getStudent().getId()}">-->
-                    <a th:href="@{/teachers/refuseStu/{Cid}/{Sid}
-                    (Cid=${s.getCourse().getCid()},Sid=${s.getStudent().getId()})}" class="btn btn-danger">拒绝</a>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-            <div style="text-align: center">
-              <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->
-              <div th:if="${page.pageNum - 1 > 0}" style="display: inline-block;">
-                <a th:href="@{'/students/AllCourse?start='+${page.pageNum - 1}}" >[上一页]</a>
-              </div>
-              <div th:if="${page.pageNum +1 < page.pages +1}" style="display: inline-block;">
-                <a th:href="@{'/students/AllCourse?start='+${page.pageNum + 1}}" >[下一页]</a>
-              </div>
-              <a th:href="@{'/students/AllCourse?start='+${page.pages}}" style="display: inline-block;">[末  页]</a>
-            </div>
-            <div align="center">
-              当前页/总页数：<a href="?start=${page.pageNum}" th:text="${page.pageNum}"></a>/<a href="?start=${page.pages}" th:text="${page.pages}"></a>
-            </div>
-          </div>
+
+          <br>
+
+          <div id="main" style="width: 600px;height:400px;margin:0 auto;"></div>
+          <script th:inline="javascript" type="text/javascript">
+              /*<![CDATA[*/
+              var chapter=[[${chapters}]];
+              var score=[[${sum}]];
+              //var averScore=[[${averSum}]];//不需要了，因为echarts自带
+              /*]]>*/
+              // 基于准备好的dom，初始化echarts实例
+              var myChart = echarts.init(document.getElementById('main'));
+
+              // 指定图表的配置项和数据
+              option = {
+                  title : {
+                      text: [[${cname}]]+'成绩统计表',
+                      subtext: '仅供参考'
+                  },
+                  tooltip : {
+                      trigger: 'axis'
+                  },
+                  legend: {
+                      data:['章节平均成绩']
+                  },
+                  toolbox: {
+                      show : true,
+                      feature : {
+                          dataView : {show: true, readOnly: false},
+                          magicType : {show: true, type: ['line', 'bar']},
+                          restore : {show: false},
+                          saveAsImage : {show: true}
+                      }
+                  },
+                  calculable : true,
+                  xAxis : [
+                      {
+                          type : 'category',
+                          data : chapter
+                      }
+                  ],
+                  yAxis : [
+                      {
+                          type : 'value'
+                      }
+                  ],
+                  series : [
+                      {
+                          name:'章节平均成绩',
+                          type:'bar',
+                          data:score,
+                          itemStyle : {
+                              normal : {
+                                  color: '#25beff'
+                              }
+                          },
+                          markPoint : {
+                              data : [
+                                  {type : 'max', name: '最大值'},
+                                  {type : 'min', name: '最小值'}
+                              ]
+                          },
+                          markLine : {
+                              data : [
+                                  {type : 'average', name: '平均值'}
+                              ],
+
+                              lineStyle:{
+                                  color:'black'
+                              }
+
+                          }
+                      }
+                  ]
+              };
+
+
+              // 使用刚指定的配置项和数据显示图表。
+              myChart.setOption(option);
+          </script>
+          <!-- 柱状图    -->
+
+
           <style type="text/css">
             button  {
               background:#b5cfd2 url('css/bulecell.jpg');
@@ -186,7 +227,6 @@
     <script th:src="@{/static/vendor/jquery.cookie/jquery.cookie.js}"> </script>
     <script th:src="@{/static/vendor/chart.js/Chart.min.js}"></script>
     <script th:src="@{/static/vendor/jquery-validation/jquery.validate.min.js}"></script>
-    <script th:src="@{/static/js/charts-home.js}"></script>
     <!-- Main File-->
     <script th:src="@{/static/js/front.js}"></script>
   </body>

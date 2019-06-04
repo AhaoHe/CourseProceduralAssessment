@@ -24,6 +24,8 @@
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+
+
   </head>
   <body>
     <div class="page">
@@ -34,7 +36,7 @@
           <div class="search-box">
             <button class="dismiss"><i class="icon-close"></i></button>
             <form id="searchForm" action="#" role="search">
-              <input type="search" placeholder="What are you looking for..." class="form-control">
+              <input type="search"  id="myInput" onkeyup="myFunction();" placeholder="What are you looking for...(通过id搜索)" class="form-control">
             </form>
           </div>
           <div class="container-fluid">
@@ -80,9 +82,8 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a th:href="@{/teacherMain}"> </i>我的信息 </a></li>
-                    <li><a th:href="@{/teachers/AllCourse}"></i>课程申请管理 </a></li>
-                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
+                    <li class="active"><a th:href="@{/teachers/course_students/{cid}(cid=${cid})}"> </i>学生管理 </a></li>
+                    <li><a th:href="@{/teacherMain}"> <i class="icon-interface-windows"></i>返回教师主页 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
@@ -97,7 +98,7 @@
 
           <div >
             <table id="table" class="table table-hover table-bordered" border="1"align="center">
-              <thead><tr class="font"><td>学号</td><td>学生姓名</td><td>学生班级</td><td>性别</td><td>操作</td></tr></thead>
+              <thead  class="font"><th>学号</th><th>学生姓名</th><th>学生班级</th><th>性别</th><th>平均成绩</th><th>操作</th></thead>
               <tbody>
               <tr th:each="a,aState:${cs}">
                   <td th:text="${a.getStudent().getId()}"></td>
@@ -106,14 +107,19 @@
                   <!-- 判断男女 -->
                   <td th:if="${a.getStudent().getSsex()==1}">男</td>
                   <td th:if="${a.getStudent().getSsex()==0}">女</td>
+
+                  <td th:if="${avState.index}==${size}*(${page.pageNum}-1)+${aState.index}" th:each="av,avState:${averSores}"
+                      th:text="${av}">
+                  </td>
+
                 <td>
-                  <a th:if="${a.getIfjoin()}==2" th:href="@{/teachers/deleteStu/{id}/{cid}(id=${a.getStudent().getId()},cid=${a.getCourse().getCid()})}"
+                  <a th:if="${a.getIfjoin()}==2" th:href="@{/teachers/deleteStu/{id}/{cid}/{pageNum}(id=${a.getStudent().getId()},cid=${a.getCourse().getCid()},pageNum=${page.pageNum})}"
                      class="btn btn-danger">申请删除</a>
-                  <a th:if="${a.getIfjoin()}==3" th:href="@{/teachers/allowStu/{Cid}/{Sid}/{x}
-                    (Cid=${a.getCourse().getCid()},Sid=${a.getStudent().getId()},x=2)}" class="btn btn-info">撤销删除</a>
+                  <a th:if="${a.getIfjoin()}==3" th:href="@{/teachers/cancelDelStu/{id}/{cid}/{pageNum}
+                    (cid=${a.getCourse().getCid()},id=${a.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-info">撤销删除</a>
 
                   <!--<a class="btn btn-info" th:href="@{/teachers/StuScores/{id}/{cid}(id=${a.getStudent().getId()},cid=${a.getCourse().getCid()})}">成绩管理</a>-->
-                  <button id="StuBtn" class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="editInfo([[${aState.index}]],[[${a.getStudent().getId()}]])">成绩管理</button>
+                  <button id="StuBtn" class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="editInfo([[${aState.index}]],[[${a.getStudent().getId()}]],[[${size}]])">成绩管理</button>
 
                 </td>
               </tr>
@@ -177,16 +183,85 @@
           </div>
 
 
+
+
+          <div class="modal fade" id="qiandaoModal" tabindex="-1" role="dialog" aria-labelledby="qiandaoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="qiandaoModalLabel">
+                    签到情况（点击修改）
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-hover table-bordered" border="1"align="center">
+
+                    <thead>
+                    <tr><th>签到序列</th><th>签到情况</th></tr>
+                    </thead>
+
+                    <tbody id="StuQiandao">
+                    </tbody>
+
+                  </table>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                  </button>
+                  <button type="button" class="btn btn-primary" id="editQiandao">
+                    更新
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
+
           <script language='javascript' th:inline="javascript">
+            window.onload=function () {
+                for (var i=1;i<[[${size}]]+1;i++){
+                    var score=document.getElementById("table").rows[i].cells[4].innerHTML;
+                    var s=Number(score);
+                    if(s<60){
+                        document.getElementById("table").rows[i].cells[4].style.cssText="color:red;";
+                    }else if(s>=60 && s<=65){
+                        document.getElementById("table").rows[i].cells[4].style.cssText="color:#ffd811;";
+                    }else if(s>90){
+                        document.getElementById("table").rows[i].cells[4].style.cssText="color:#39c764;";
+                    }
+                }
+
+            }
+
+
               // 展示学生成绩
-              function editInfo(id,StuId) {
-                  var scores=[[${scores}]][id];
+              function editInfo(id,StuId,size) {
+                  var num=size*([[${page.pageNum}]]-1)+id;
+                  var scores=[[${scores}]][num];
                   //动态创建表格的方式，使用拼接html的方式 （推荐）
                   var html = "";
                   for( var i = 0; i < scores.length; i++ ) {
                        html += "<tr>";
                        html +=     "<td>" + [[${chapters}]][i] + "</td>"
-                       html +=     "<td id='ssr"+i+"'>" + scores[i] + "</td>"
+                      if (Number(scores[i])>90){
+                          html +=     "<td id='ssr"+i+"' style='color: #39c764'>" + scores[i] + "</td>"
+                      } else if(Number(scores[i])<60){
+                          html +=     "<td id='ssr"+i+"' style='color: red'>" + scores[i] + "</td>"
+                      }else {
+                          html +=     "<td id='ssr"+i+"'>" + scores[i] + "</td>"
+                      }
                        html += "</tr>";
                   }
                   //生成新表格
@@ -194,25 +269,24 @@
 
                   $('#StuSocres td').click(function(){
                       if(!$(this).is('.input')){
-                          $(this).addClass('input').html('<input type="text" value="'+ $(this).text() +'" />').find('input').focus().blur(function(){
-                              var thisid = $(this).parent().siblings("th:eq(0)").text();
-                              var thisvalue=$(this).val();
-                              var thisclass = $(this).parent().attr("class");
+                          $(this).addClass('input').html('<input type="text" style="width: 66px" value="'+ $(this).text() +'" />').find('input').focus().blur(function(){//当点击后会给他一个
+                              //var thisid = $(this).parent().siblings("th:eq(0)").text();//返回同行的0列元素，即id
+                              var thisvalue=$(this).val();//获得值
+                              //var thisclass = $(this).parent().attr("class");
                               $(this).parent().removeClass('input').html($(this).val() || 0);
                           });
                       }
-                  }).hover(function(){
+                  })/*.hover(function(){
                       $(this).addClass('hover');
                   },function(){
                       $(this).removeClass('hover');
-                  });
+                  })*/;
 
                   $('#editScores').unbind("click").bind("click",function(){//bind("click",function()相当于click(function()
                       //$("#editScores").click(function(){ //必须加unbind("click")清除之前的点击事件
                       var sum=[];
                       for (var i=0;i<scores.length;i++){
-                          var findName=document.getElementById("ssr"+i).innerText;
-                          sum[i]=findName;
+                          sum[i]=document.getElementById("ssr"+i).innerText;;
                       }
                       var result=sum.join("||");
                       /*<![CDATA[*/
@@ -291,6 +365,7 @@
     <script th:src="@{/static/vendor/chart.js/Chart.min.js}"></script>
     <script th:src="@{/static/vendor/jquery-validation/jquery.validate.min.js}"></script>
     <script th:src="@{/static/js/charts-home.js}"></script>
+    <script th:src="@{/static/js/findFunction.js}"></script><!--搜索功能-->
     <!-- Main File-->
     <script th:src="@{/static/js/front.js}"></script>
   </body>

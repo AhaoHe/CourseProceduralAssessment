@@ -45,9 +45,19 @@ public class CourseService {
         return courseMapper.COURSE_STUDENTS(cid);
     }
 
+    //查询某门课有哪些学生，不管在申请还是被正在被删除
+    public List<Course_Students> getStudentsAllByCid(Integer cid){
+        return courseMapper.getStudentsAllByCid(cid);
+    }
+
     //修改或者删除章节
     public int updateChapters(String chapters,int cid){
         return courseMapper.UpdateandDelChapters(chapters,cid);
+    }
+
+    //修改或者删除难度
+    public int updateHardness(String hardness,int cid){
+        return courseMapper.UpdateandDelHardness(hardness,cid);
     }
 
     //修改或删除学生成绩

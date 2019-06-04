@@ -81,49 +81,193 @@
           </div>
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
-                    <li class="active"><a th:href="@{/adminMain}"> </i>课程管理 </a></li>
-                    <li><a th:href="@{/Admin/students}"></i>学生管理 </a></li>
-                    <li><a th:href="@{/Admin/teachers}"></i>教师管理 </a></li>
-                    <li><a th:href="@{/Admin/classname}"></i>班级管理 </a></li>
-                    <li><a th:href="@{/}"> <i class="icon-interface-windows"></i>返回主页 </a></li>
+                    <li class="active"><a th:href="@{/Admin/TeaDelStu/{cid}(cid=${courseID})}"></i>学生信息 </a></li>
+                    <li><a th:href="@{/adminMain}"> <i class="icon-interface-windows"></i>返回课程管理 </a></li>
           </ul>
         </nav>
         <div class="content-inner">
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <a th:href="@{/adminMain}" class="no-margin-bottom">返回</a>
+              <a data-toggle="modal" data-target="#editModal" class="btn btn-info">导入学生</a>
             </div>
           </header>
           <!-- Dashboard Header Section    -->
           <br>
           <div >
             <table class="table table-hover table-bordered" border="1"align="center">
-              <thead><tr class="font"><td>学号</td><td>被删除的学生</td><td>班级</td><td>性别</td><td>操作</td></tr></thead>
-              <tbody>
-              <tr th:each="c:${courses}">
-                <td th:text="${c.getStudent().getId()}"></td>
-                <td th:text="${c.getStudent().getSname()}"></td>
+              <thead align="center"><tr class="font"><td>学号</td><td>学生姓名</td><td>班级</td><td>性别</td><td>状态</td><td>操作</td></tr></thead>
+              <tbody align="center">
+              <tr th:each="c:${course_students}">
+                <td th:text="${c.getStudent().getId()}" style="width: 15%"></td>
+                <td th:text="${c.getStudent().getSname()}" style="width: 15%"></td>
 
-                <td th:text="${c.getStudent().getSclass()}"></td>
+                <td th:text="${c.getStudent().getClassName().getClassname()}" style="width: 15%"></td>
 
                 <!--判断男女-->
-                <td th:if="${c.getStudent().getSsex()==1}">男</td>
-                <td th:if="${c.getStudent().getSsex()==0}">女</td>
+                <td th:if="${c.getStudent().getSsex()==1}" style="width: 10%">男</td>
+                <td th:if="${c.getStudent().getSsex()==0}" style="width: 10%">女</td>
 
-                <td><a th:href="@{/Admin/allowDelStu/{Cid}/{Sid}
-                (Cid=${c.getCourse().getCid()},Sid=${c.getStudent().getId()})}">同意删除</a>
-                  <a th:href="@{/Admin/refuseDelStu/{Cid}/{Sid}
-                  (Cid=${c.getCourse().getCid()},Sid=${c.getStudent().getId()})}">撤回删除</a>
+                <!--状态-->
+                <td style="width: 15%">
+                  <span th:if="${c.getIfjoin()}==3" style="color: red">申请删除中</span>
+                  <span th:if="${c.getIfjoin()}==2" style="color: green">正常</span>
+                  <span th:if="${c.getIfjoin()}==1" style="color: #ffd811">申请课程中</span>
+                </td>
+
+                <td style="width: 25%">
+                  <span th:if="${c.getIfjoin()}==3">
+                    <a th:href="@{/Admin/allowDelStu/{Cid}/{Sid}/{pageNum}(Cid=${courseID},Sid=${c.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-danger">同意删除</a>
+                    <a th:href="@{/Admin/refuseDelStu/{Cid}/{Sid}/{pageNum}(Cid=${courseID},Sid=${c.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-info">撤回删除</a>
+                  </span>
+
+                  <span th:if="${c.getIfjoin()}==2">
+                    <a th:href="@{/Admin/allowDelStu/{Cid}/{Sid}/{pageNum}(Cid=${courseID},Sid=${c.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-danger">删除学生</a>
+                  </span>
+
+                  <span th:if="${c.getIfjoin()}==1">
+                    <a th:href="@{/Admin/refuseDelStu/{Cid}/{Sid}/{pageNum}(Cid=${courseID},Sid=${c.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-info">同意学生</a>
+                    <a th:href="@{/Admin/allowDelStu/{Cid}/{Sid}/{pageNum}(Cid=${courseID},Sid=${c.getStudent().getId()},pageNum=${page.pageNum})}" class="btn btn-danger">拒绝学生</a>
+                  </span>
+
                 </td>
               </tr>
               </tbody>
             </table>
           </div>
+
+          <div style="text-align: center">
+            <a href="?start=1" style="display: inline-block;">[首  页]</a>  <!-- 这是相对路径的写法。 前面没有斜线就是相对当前路径加上这个地址。 -->
+            <div th:if="${page.pageNum - 1 > 0}" style="display: inline-block;">
+              <a th:href="@{'?start='+${page.pageNum - 1}}" >[上一页]</a>
+            </div>
+            <div th:if="${page.pageNum +1 < page.pages +1}" style="display: inline-block;">
+              <a th:href="@{'?start='+${page.pageNum + 1}}" >[下一页]</a>
+            </div>
+            <a th:href="@{'?start='+${page.pages}}" style="display: inline-block;">[末  页]</a>
+          </div>
+          <div align="center">
+            当前页/总页数：<a th:href="@{'?start='+${page.pageNum}}" th:text="${page.pageNum}"></a>/<a th:href="@{'?start='+${page.pages}}" th:text="${page.pages}"></a>
+          </div>
+
+
+<!--添加未加入的学生信息-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="myModalLabel">
+                    未加入课程的学生信息
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                  <div class="modal-body">
+
+                    <div class="form-group">
+
+                      <table class="table table-hover table-bordered" border="1"align="center">
+                        <thead>
+                          <tr>
+                            <th><input type="checkbox" name="items" onclick="checkAll(this)"> 全选</th>
+                            <th>学生ID</th><th>学生姓名</th><th>性别</th><th>班级</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <tr th:each="s:${others}">
+                            <td><input type="checkbox" id="item" name="item" th:value="${s.getId()}"/></td>
+                            <td th:text="${s.getId()}"></td>
+                            <td th:text="${s.getSname()}"></td>
+
+                            <!--判断男女-->
+                            <td th:if="${s.getSsex()}==1" th:text="男"></td>
+                            <td th:if="${s.getSsex()}==0" th:text="女"></td>
+
+                            <td th:text="${s.getClassName().getClassname()}"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="importStudents();">
+                      导入
+                    </button>
+                  </div>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+
+              //全选学生
+              function checkAll(c) {
+                  var status = c.checked;
+                  var oItems = document.getElementsByName('item');
+                  for(var i=0;i<oItems.length;i++){
+                      oItems[i].checked=status;
+                  }
+              }
+
+              //导入所有选中学生
+              function importStudents() {
+                  /*<![CDATA[*/
+                  //判断至少写了一项
+                  var checkedNum = $("input[name='item']:checked").length;
+                  if(checkedNum==0){
+                      alert("请至少选择一项!");
+                      return false;
+                  }
+                  if(confirm("确定导入所选学生?")) {
+                      var checkedList = new Array();
+                      var addUrl = /*[[@{/Admin/importStu}]]*/;//获取动作地址
+                      $("input[name='item']:checked").each(function () {
+                          checkedList.push($(this).val());
+                      });
+                      $.ajax({
+                          type: "POST",
+                          url: addUrl,
+                          data: {
+                              "items": checkedList.toString(),
+                              "cid" : [[${courseID}]]
+                          },
+                          datatype: 'json',
+                          success: function (data) {
+                              location.reload();//页面刷新
+                          },
+                          error: function (data) {
+                              art.dialog.tips('导入失败!');
+                          }
+                      });
+                  }
+                  /*]]>*/
+              }
+
+          </script>
+
+
           <style type="text/css">
-            button  {
-              background:#b5cfd2 url('css/bulecell.jpg');
-            }
+            /*产生滚轮*/
+            .modal-dialog{position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
+            .modal-content{/*overflow-y: scroll; */ position: absolute; top: 0; bottom: 0; width: 100%;}
+            .modal-body{overflow-y: scroll; position: absolute; top: 55px; bottom: 65px; width: 100%;}
+            .modal-header .close{margin-right: 15px;}
+            .modal-footer{position: absolute; width: 100%; bottom: 0;}
+
+
             tr.font {
               font-size: 20px;
             }

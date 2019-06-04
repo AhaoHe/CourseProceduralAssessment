@@ -58,7 +58,7 @@
                         <div class="notification">
 
                         </div></a></li>
-                    <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>view all notifications                                            </strong></a></li>
+                    <li><a rel="nofollow" href="#" class="dropdown-item all-notifications text-center"> <strong>No notifications                                            </strong></a></li>
                   </ul>
                 </li>
 
@@ -67,15 +67,17 @@
                   function test() {
                       //动态创建li的方式，使用拼接html的方式 （推荐）
                       var html = "";
-                      for(var i=0;i<[[${session.warn}]].length;i++){
-                          if ([[${session.warn}]][i]!="empty") {
-                              html += "<li>";
-                              html += "<a rel=\"nofollow\" href=\"#\" class=\"dropdown-item all-notifications text-center\"><strong style='color: red'>" + [[${session.warn}]][i] + "</strong></a>"
-                              html += "</li>";
+                      if([[${session.msgCount}]] > 0){
+                          for(var i=0;i<[[${session.warn}]].length;i++){
+                              if ([[${session.warn}]][i]!="empty") {
+                                  html += "<li>";
+                                  html += "<a rel=\"nofollow\" href=\"#\" class=\"dropdown-item all-notifications text-center\"><strong style='color: red'>" + [[${session.warn}]][i] + "</strong></a>"
+                                  html += "</li>";
+                              }
                           }
+                          //生成新表格
+                          $("#messages").html(html);
                       }
-                      //生成新表格
-                      $("#messages").html(html);
                   }
                     /* ]]> */
                 </script>
@@ -120,7 +122,8 @@
             <h1 class="h4" align="center">所选课程</h1>
             <table class="table table-hover table-bordered" border="1"align="center">
 
-              <tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>性别</th><th>操作</th></tr>
+              <thead align="center"><tr class="font"><th>课程编号</th><th>课程名称</th><th>老师名称</th><th>性别</th><th>操作</th><th>课程介绍</th></tr></thead>
+              <tbody align="center">
               <tr th:each="c:${courses}">
                 <td th:text="${c.getCid()}"></td>
                 <td th:text="${c.getCourse()}"></td>
@@ -132,11 +135,79 @@
 
                 <td><a th:href="@{/students/checkArrived/{cid}(cid=${c.getCid()})}" class="btn btn-info">进入</a>
                   <a th:href="@{/students/StuScores/{cid}(cid=${c.getCid()})}"
-                     class="btn btn-info">成绩</a></td>
+                  class="btn btn-info">成绩</a>
+                </td>
+                <td> <button th:onclick="editInfo([[${c.getInformation()}]],[[${c.getType()}]])"
+                             class="btn btn-info" data-toggle="modal" data-target="#editModal">查看</button>
+                </td>
               </tr>
-
+              </tbody>
             </table>
           </div>
+
+
+          <!--显示课程介绍-->
+          <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="editModalLabel">
+                    课程介绍
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                  <div class="modal-body">
+
+                    <div class="form-group">
+                      <label for="type1" class="col-sm-3 control-label" style="color: blue">课程类型</label>
+                      <div class="col-sm-9">
+                        <input type="checkbox" id="type1" name="typeX" value="1" onclick="return false;"/> 考勤&nbsp;&nbsp;
+                        <input type="checkbox" id="type2" value="1" name="typeX" onclick="return false;"/> 作业&nbsp;&nbsp;
+                        <input type="checkbox" id="type3" value="1" name="typeX" onclick="return false;"/> 实验
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="information" class="col-sm-3 control-label">课程介绍</label>
+                      <div class="col-sm-9">
+                        <textarea type="text" class="form-control" id="information" name="information" readonly="true"></textarea>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                  </div>
+                </form>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <script language='javascript' th:inline="javascript">
+              function editInfo(information,type) {
+                  $("#information").val(information);
+                  var result=type.split(",");
+                  var boxes = document.getElementsByName("typeX");
+                  for(var i=0;i<boxes.length;i++){
+                      if(result[i]=="1"){
+                          boxes[i].checked=true;
+                      }else {
+                          boxes[i].checked=false;
+                      }
+                  }
+              }
+          </script>
+
+
           <style type="text/css">
             tr.font {
               font-size: 20px;

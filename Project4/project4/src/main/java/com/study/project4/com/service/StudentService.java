@@ -31,6 +31,7 @@ public class StudentService {
 
     //查询某个人某门课成绩
     //查询某个人某门课签到信息
+    //查询某个人ifjoin是否添加课程
     public Course_Students getScores(int cid,int id){
         return studentsMapper.getScoresByCidandId(cid,id);
     }

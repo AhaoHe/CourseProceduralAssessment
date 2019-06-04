@@ -34,11 +34,15 @@ public class TeacherService {
     public List<Course_Students> findAddStudents(Integer tid){
         return teacherMapper.getaddStuByTid(tid);
     }
+
+
     //允许学生添加课程  //撤回删除某门课的某个学生  //管理员拒绝删除某门课的某个学生
+    //将ifjoin变为2  即正常状态
     public int allowStudents(Integer cid,Integer id){
         return  teacherMapper.allowStudents(cid,id);
     }
     //拒绝学生  //管理员同意删除某个学生
+    //将这行信息删除掉
     public int refuseStudents(Integer cid,Integer id){
         return  teacherMapper.refuseStudents(cid,id);
     }
@@ -52,8 +56,15 @@ public class TeacherService {
     public int updateQiandao(int cid,String sum){
         return teacherMapper.updateQiandao(cid,sum);
     }
-    //添加学生签到情况
-    public int updateStuQiandao(int cid,String sum){
-        return teacherMapper.updateStuQiandao(cid,sum);
+
+
+    //修改是否允许课程申请
+    public int updateOpen(int cid,int x){
+        return teacherMapper.updateOpen(cid,x);
+    }
+
+    //修改课程介绍
+    public int editInformation(int cid,String information,String type){
+        return teacherMapper.editInformation(cid,information,type);
     }
 }

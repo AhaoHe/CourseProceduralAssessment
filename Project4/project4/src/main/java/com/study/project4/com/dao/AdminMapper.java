@@ -3,12 +3,14 @@ package com.study.project4.com.dao;
 import com.study.project4.com.entity.*;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
-
 //必须设置@Mapper在cProject4Application中设置@MapperScan扫描mapper文件
 //在Mapper文件中用注解写SQL语句
 
 public interface AdminMapper {
+
+    /*
+    *type：0,0,0  第一个代表考勤类型，第二个作业类型，第三个实验类型
+    * */
 
     //登录系统，查询是否存在账户和密码
     @Select("select * from Admin where aid = #{aid}")
@@ -46,10 +48,10 @@ public interface AdminMapper {
     public int deleteCourse(Integer id);
     //添加课程信息
     @Options(useGeneratedKeys = true,keyProperty = "cid")
-    @Insert("insert into course(course,tid) values(#{course.course},#{course.teacher.tid})")
+    @Insert("insert into course(course,tid,information,type) values(#{course.course},#{course.teacher.tid},#{course.information},#{course.type})")
     public  int insetCourse(@Param("course")Course course);
     //修改课程信息
-    @Update("UPDATE course SET course=#{course.course},tid=#{course.teacher.tid} " +
+    @Update("UPDATE course SET course=#{course.course},tid=#{course.teacher.tid},information=#{course.information},type=#{course.type} " +
             "WHERE cid=#{course.cid}")
     public int updateCourse(@Param("course")Course course);
 
@@ -66,7 +68,12 @@ public interface AdminMapper {
             "WHERE classid=#{className.classid}")
     public int updateClass(@Param("className") ClassName className);
 
-    //查询哪门课有哪些老师要删除哪些学生
+    //导入学生
+    @Insert("INSERT INTO course_students(cid,id,ifjoin) values(#{cid},#{id},2)")
+    public  int importStudents(@Param("cid") int cid,@Param("id") int id);
+
+
+    /*查询哪门课有哪些老师要删除哪些学生，已经被CouseMapper里的getStudentsAllByCid(int cid)代替
     @Select("SELECT cs.cid,s.id,s.sname,s.classid,s.ssex " +
             "FROM course_students cs,student s " +
             "WHERE cs.ifjoin=3 AND s.id=cs.id AND cs.cid=#{cid}")
@@ -76,6 +83,6 @@ public interface AdminMapper {
             @Result(column = "cid", property = "course",javaType = Course.class,
                     one = @One(select = "com.study.project4.com.dao.CourseMapper.getCourseByCid"))
     })
-    public List<Course_Students> findTeaDelStuAll(Integer cid);
+    public List<Course_Students> findTeaDelStuAll(Integer cid);*/
 
 }

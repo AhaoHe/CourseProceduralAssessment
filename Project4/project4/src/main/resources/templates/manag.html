@@ -122,7 +122,7 @@
 
                 <td><a th:href="@{/Admin/deleteC/{id}(id=${c.getCid()})}" class="btn btn-danger">删除</a>
                   <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editModal" th:id="${cState.index+1}"
-                  onclick="editInfo(this)">编辑</button>
+                  th:onclick="editInfo(this,[[${c.getInformation()}]]);">编辑</button>
                   <a th:href="@{/Admin/TeaDelStu/{cid}(cid=${c.getCid()})}" class="btn btn-info">课程管理</a>
                 </td>
 
@@ -172,11 +172,28 @@
                       </div>
                     </div>
 
+                    <div class="form-group">
+                      <label for="type1" class="col-sm-3 control-label" style="color: blue">课程类型</label>
+                      <div class="col-sm-9">
+                        <input type="checkbox" id="typeX1" name="typeY" value="1" /> 考勤&nbsp;&nbsp;
+                        <input type="checkbox" id="typeX2" value="1" name="typeY" /> 作业&nbsp;&nbsp;
+                        <input type="checkbox" id="typeX3" value="1" name="typeY" /> 实验
+                        <input type="hidden" id="typeY" name="type" >
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="information" class="col-sm-3 control-label">课程介绍</label>
+                      <div class="col-sm-9">
+                        <textarea type="text" class="form-control" id="information" name="information"></textarea>
+                      </div>
+                    </div>
+
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" onclick="editCourse();">
                       提交
                     </button>
                   </div>
@@ -195,15 +212,27 @@
 
           <script language='javascript' th:inline="javascript">
               // 编辑课程
-              function editInfo(obj) {
+              function editInfo(obj,information) {
                   var id=$(obj).attr("id");
-                  var cid=document.getElementById("table").rows[id].cells[0].innerText;
-                  var cname = document.getElementById("table").rows[id].cells[1].innerText;
-                  var tname = document.getElementById("table").rows[id].cells[2].innerText;
+                  var cid=document.getElementById("table").rows[id].cells[1].innerText;
+                  var cname = document.getElementById("table").rows[id].cells[2].innerText;
+                  var tname = document.getElementById("table").rows[id].cells[3].innerText;
                   var tid=document.getElementById("tid");
+
+                  var type=[[${courses}]][id-1];
+                  var result=type.type.split(",");
+                  var boxes = document.getElementsByName("typeY");
+                  for(var i=0;i<boxes.length;i++){
+                      if(result[i]=="1"){
+                          boxes[i].checked=true;
+                      }else {
+                          boxes[i].checked=false;
+                      }
+                  }
 
                   $('#cid').val(cid);
                   $('#course').val(cname);
+                  $("#information").val(information);
                   for (var i=0;i<tid.length;i++){
                       if (tid.options[i].text==tname){
                           tid.options[i].selected = true;
@@ -251,9 +280,23 @@
                   }
                   /*]]>*/
               }
+
+              function editCourse() {
+                  var obj=document.getElementsByName("typeY");
+                  var value=[];
+                  for (var k=0;k<obj.length;k++){
+                      if (obj[k].checked){
+                          value.push(obj[k].value);
+                      }else{
+                          value.push("0");
+                      }
+                  }
+                  $("#typeY").val(value.toString());
+              }
           </script>
 
 
+          <!--t添加课程-->
           <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
@@ -284,11 +327,28 @@
                       </div>
                     </div>
 
+                    <div class="form-group">
+                      <label for="type1" class="col-sm-3 control-label" style="color: blue">课程类型</label>
+                      <div class="col-sm-9">
+                        <input type="checkbox" id="type1" name="typeX" value="1" /> 考勤&nbsp;&nbsp;
+                        <input type="checkbox" id="type2" value="1" name="typeX" /> 作业&nbsp;&nbsp;
+                        <input type="checkbox" id="type3" value="1" name="typeX" /> 实验
+                        <input type="hidden" id="typeX" name="addtype" >
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="addinformation" class="col-sm-3 control-label">课程介绍</label>
+                      <div class="col-sm-9">
+                        <textarea type="text" class="form-control" id="addinformation" name="addinformation"></textarea>
+                      </div>
+                    </div>
+
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" onclick="addCourse();">
                       提交
                     </button>
                   </div>
@@ -302,6 +362,21 @@
 
                 <!-- /.modal -->
           </div>
+
+          <script>
+              function addCourse() {
+                  var obj=document.getElementsByName("typeX");
+                  var value=[];
+                  for (var k=0;k<obj.length;k++){
+                      if (obj[k].checked){
+                          value.push(obj[k].value);
+                      }else{
+                          value.push("0");
+                      }
+                  }
+                  $("#typeX").val(value.toString());
+              }
+          </script>
 
 
           <style type="text/css">

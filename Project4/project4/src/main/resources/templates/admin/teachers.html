@@ -193,9 +193,9 @@
               // 编辑课程
               function editInfo(obj) {
                   var id=$(obj).attr("id");
-                  var tid=document.getElementById("table").rows[id].cells[0].innerText;
-                  var tname = document.getElementById("table").rows[id].cells[1].innerText;
-                  var tsex = document.getElementById("table").rows[id].cells[2].innerText;
+                  var tid=document.getElementById("table").rows[id].cells[1].innerText;
+                  var tname = document.getElementById("table").rows[id].cells[2].innerText;
+                  var tsex = document.getElementById("table").rows[id].cells[3].innerText;
 
 
                   $('#teacherId').val(tid);

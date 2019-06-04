@@ -88,8 +88,9 @@
           <!-- Page Header-->
           <header class="page-header">
             <div class="container-fluid">
-              <a class="no-margin-bottom" style="margin-right: 80%;" th:href="@{/teacherMain}">返回</a>
               <a type="button" class="btn btn-info" th:href="@{/teachers/AddQiandao/{cid}(cid=${courseID})}">添加签到</a>
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#stuModal" th:if="${stu.size()}!=0">即将挂科名单</button>
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#stuDieModal" th:if="${stuDie.size()}!=0">挂科名单（签到）</button>
             </div>
           </header>
 
@@ -105,8 +106,8 @@
 
                 <td th:if="${q.toString()}!=''" style="width: 45%" align="center">
                   <button class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="qiandaoInfo([[${qStat.index}]])">已签到名单</button>
-                  <button class="btn btn-info" data-toggle="modal" data-target="#chidaoModal" th:onclick="chidaoInfo([[${qStat.index}]])">迟到名单</button>
-                  <button class="btn btn-info" data-toggle="modal" data-target="#othersModal" th:onclick="ohtersInfo([[${qStat.index}]])">未签到名单</button>
+                  <button class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="chidaoInfo([[${qStat.index}]])">迟到名单</button>
+                  <button class="btn btn-info" data-toggle="modal" data-target="#editModal" th:onclick="ohtersInfo([[${qStat.index}]])">未签到名单</button>
                 </td>
 
                 <td th:if="${q.toString()}!=''" style="width: 40%">
@@ -141,6 +142,99 @@
               }
           </script>
 
+          <!--即将挂科名单-->
+          <div class="modal fade" id="stuModal" tabindex="-1" role="dialog" aria-labelledby="stuModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="stuModalLabel">
+                    还有一次缺勤就挂科了！(缺勤3次及以上者挂科)
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <div class="modal-body">
+
+                  <table class="table table-hover table-bordered" border="1" align="center">
+
+                    <thead>
+                    <tr><th>学生ID</th><th>学生姓名</th><th>学生班级</th></tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="s:${stu}">
+                      <td th:text="${s.getStudent().getId()}"></td>
+                      <td th:text="${s.getStudent().getSname()}"></td>
+                      <td th:text="${s.getStudent().getClassName().getClassname()}"></td>
+                    </tr>
+                    </tbody>
+
+                  </table>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+          <!--缺勤三分之一以上名单-->
+          <div class="modal fade" id="stuDieModal" tabindex="-1" role="dialog" aria-labelledby="stuDieModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h4 class="modal-title" id="stuDieModalLabel">
+                    缺勤3次及以上者的人
+                  </h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    ×
+                  </button>
+                </div>
+                <div class="modal-body">
+
+                  <table class="table table-hover table-bordered" border="1" align="center">
+
+                    <thead>
+                    <tr><th>学生ID</th><th>学生姓名</th><th>学生班级</th></tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="s:${stuDie}">
+                      <td th:text="${s.getStudent().getId()}"></td>
+                      <td th:text="${s.getStudent().getSname()}"></td>
+                      <td th:text="${s.getStudent().getClassName().getClassname()}"></td>
+                    </tr>
+                    </tbody>
+
+                  </table>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                  </button>
+                </div>
+
+              </div>
+
+              <!-- /.modal-content -->
+
+            </div>
+
+            <!-- /.modal -->
+          </div>
+
+
 
           <!--签到名单-->
           <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -155,17 +249,24 @@
                     ×
                   </button>
                 </div>
-                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
+                <!--<form th:action="@{/teachers/QiandaoUpdate}">-->
                   <div class="modal-body">
 
+                    <!--form表单的形式
+                    <input style="display: none" value="" name="editStu" id="editStu"/>
+                    <input style="display: none" name="cid" th:value="${courseID}"/>
+                    <input style="display: none" value="" name="index" id="index"/>
+                    <input style="display: none" value="" name="sum" id="sum"/>
+                    -->
                     <table class="table table-hover table-bordered" border="1" align="center">
 
                       <thead>
-                        <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
+                        <tr><th>学生ID</th><th>学生姓名</th><th>学生班级</th><th>签到情况</th></tr>
                       </thead>
 
                       <tbody id="StuQiandao">
                         <tr>
+                          <td></td>
                           <td></td>
                           <td></td>
                           <td></td>
@@ -176,13 +277,13 @@
 
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                      提交
-                    </button>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                      </button>
+                      <button type="button" class="btn btn-primary" id="editStuQiandao">
+                          更新
+                      </button>
                   </div>
-                </form>
+               <!-- </form>-->
 
               </div>
 
@@ -195,6 +296,7 @@
 
 
           <script language='javascript' th:inline="javascript">
+              <!--签到的名单-->
             function qiandaoInfo(index) {
                 /*<![CDATA[*/
                 var addUrl = /*[[@{/teachers/getQiandao}]]*/;//获取动作地址
@@ -208,6 +310,7 @@
                     },
                     success: function(data) {
                         makeTable(data);
+                        editInfo(index,data.length);
                     }
                 });
 
@@ -221,79 +324,56 @@
                         html += "<tr>";
                         html +=     "<td>" + list[i].student.id + "</td>"
                         html +=     "<td>" + list[i].student.sname + "</td>"
+                        html +=     "<td>" + list[i].student.className.classname + "</td>"
                         if(list[i].arrived=="1"){
-                          html +=   "<td>" + "已签到" + "</td>"
+                            html +=   "<td>"
+                                + "<select id='selectedValue"+i+"'>"
+                                    +"<option value='0'>缺勤</option>"
+                                    +"<option value='1' selected>已签到</option>"
+                                    +"<option value='2'>请假or其他情况</option>"
+                                    +"<option value='3'>迟到</option>"
+                                +"</select>"
+                                + "</td>"
                         }else {
-                          html +=   "<td>" + "请假or其他情况" + "</td>"
+                            html +=   "<td>"
+                                    + "<select id='selectedValue"+i+"'>"
+                                        +"<option value='0'>缺勤</option>"
+                                        +"<option value='1'>已签到</option>"
+                                        +"<option value='2' selected>请假or其他情况</option>"
+                                        +"<option value='3'>迟到</option>"
+                                    +"</select>"
+                                + "</td>"
                         }
                         html += "</tr>";
                     }
                     //生成新表格
                     $("#StuQiandao").html(html);
                     $("#editModalLabel").html(result);
+
                 }
                 /*]]>*/
+
+                //form表单的形式
+                /*
+                $("#editStuQiandao").unbind("click").bind("click",function(){
+                    var sum=[];
+                    var editStu=[];
+                    for (var i=0;i<xlength;i++){
+                        sum[i]=$("#selectedValue"+i).val();
+                        editStu[i]=document.getElementById("StuQiandao").rows[i].cells[0].innerText;
+                    }
+                    var result=sum.join(",");
+                    var resultID=editStu.join(",");
+                    $("#editStu").val(editStu);
+                    $("#sum").val(result);
+                    $("#index").val(index);
+
+                });*/
+
+
+
             }
-
-          </script>
-
-
-
-
-
-
-          <!--迟到名单-->
-          <div class="modal fade" id="chidaoModal" tabindex="-1" role="dialog" aria-labelledby="chidaoModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-
-                <div class="modal-header">
-                  <h4 class="modal-title" id="chidaoModalLabel">
-                    已签到情况-签到人数:，总人数:[[${count}]]
-                  </h4>
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    ×
-                  </button>
-                </div>
-                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
-                  <div class="modal-body">
-
-                    <table class="table table-hover table-bordered" border="1" align="center">
-
-                      <thead>
-                      <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
-                      </thead>
-
-                      <tbody id="StuChidao">
-                      <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                      </tbody>
-
-                    </table>
-
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                      提交
-                    </button>
-                  </div>
-                </form>
-
-              </div>
-
-              <!-- /.modal-content -->
-
-            </div>
-
-            <!-- /.modal -->
-          </div>
-
-          <script language='javascript' th:inline="javascript">
+            <!--迟到-->
               function chidaoInfo(index) {
                   /*<![CDATA[*/
                   var addUrl = /*[[@{/teachers/getChidao}]]*/;//获取动作地址
@@ -307,6 +387,7 @@
                       },
                       success: function(data) {
                           makeTable(data);
+                          editInfo(index,data.length);
                       }
                   });
 
@@ -319,74 +400,26 @@
                           html += "<tr>";
                           html +=     "<td>" + list[i].student.id + "</td>"
                           html +=     "<td>" + list[i].student.sname + "</td>"
+                          html +=     "<td>" + list[i].student.className.classname + "</td>"
                           if(list[i].arrived=="3"){
-                              html +=   "<td>" + "迟到" + "</td>"
+                              html +=   "<td>"
+                                          + "<select id='selectedValue"+i+"'>"
+                                              +"<option value='0'>缺勤</option>"
+                                              +"<option value='1'>已签到</option>"
+                                              +"<option value='2'>请假or其他情况</option>"
+                                              +"<option value='3' selected>迟到</option>"
+                                          + "</select>"
+                                  + "</td>"
                           }
                           html += "</tr>";
                       }
                       //生成新表格
-                      $("#StuChidao").html(html);
-                      $("#chidaoModalLabel").html(result);
+                      $("#StuQiandao").html(html);
+                      $("#editModalLabel").html(result);
                   }
                   /*]]>*/
               }
-
-          </script>
-
-
-
-          <!--缺勤名单-->
-          <div class="modal fade" id="othersModal" tabindex="-1" role="dialog" aria-labelledby="othersModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-
-                <div class="modal-header">
-                  <h4 class="modal-title" id="othersModalLabel">
-                    已签到情况-签到人数:，总人数:[[${count}]]
-                  </h4>
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    ×
-                  </button>
-                </div>
-                <form th:action="@{/teachers/updateChapter/{cid}(cid=${courseID})}" method="post">
-                  <div class="modal-body">
-
-                    <table class="table table-hover table-bordered" border="1" align="center">
-
-                      <thead>
-                      <tr><th>学生ID</th><th>学生姓名</th><th>签到情况</th></tr>
-                      </thead>
-
-                      <tbody id="StuOthers">
-                      <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
-                      </tbody>
-
-                    </table>
-
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                      提交
-                    </button>
-                  </div>
-                </form>
-
-              </div>
-
-              <!-- /.modal-content -->
-
-            </div>
-
-            <!-- /.modal -->
-          </div>
-
-          <script language='javascript' th:inline="javascript">
+              <!--缺勤-->
               function ohtersInfo(index) {
                   /*<![CDATA[*/
                   var addUrl = /*[[@{/teachers/getOthers}]]*/;//获取动作地址
@@ -400,6 +433,7 @@
                       },
                       success: function(data) {
                           makeTable(data);
+                          editInfo(index,data.length);
                       }
                   });
 
@@ -412,25 +446,65 @@
                           html += "<tr>";
                           html +=     "<td>" + list[i].student.id + "</td>"
                           html +=     "<td>" + list[i].student.sname + "</td>"
+                          html +=     "<td>" + list[i].student.className.classname + "</td>"
                           if(list[i].arrived=="0"){
-                              html +=   "<td>" + "缺勤" + "</td>"
+                              html +=   "<td>"
+                                            + "<select id='selectedValue"+i+"'>"
+                                              +"<option value='0' selected>缺勤</option>"
+                                              +"<option value='1'>已签到</option>"
+                                              +"<option value='2'>请假or其他情况</option>"
+                                              +"<option value='3'>迟到</option>"
+                                            +"</select>"
+                                        + "</td>"
                           }
                           html += "</tr>";
                       }
                       //生成新表格
-                      $("#StuOthers").html(html);
-                      $("#othersModalLabel").html(result);
+                      $("#StuQiandao").html(html);
+                      $("#editModalLabel").html(result);
                   }
                   /*]]>*/
+              }
+
+              function editInfo(index,xlength) {
+                  $("#editStuQiandao").unbind("click").bind("click",function(){
+                      var sum=[];
+                      var editStu=[];
+                      for (var i=0;i<xlength;i++){
+                          sum[i]=$("#selectedValue"+i).val();
+                          editStu[i]=document.getElementById("StuQiandao").rows[i].cells[0].innerText;
+                      }
+                      var result=sum.join(",");
+                      var resultID=editStu.join(",");
+                      /*<![CDATA[*/
+                      var editUrl = /*[[@{/teachers/QiandaoUpdate}]]*/;//获取动作地址
+                      /*]]>*/
+                      $.ajax({
+                          type: "POST",
+                          url: editUrl,
+                          dataType:'json',
+                          data: {
+                              "sum": result,
+                              "editStu": resultID,
+                              "cid": [[${courseID}]],
+                              "index": index
+                          },
+                          success: function(data) {
+                              $('#editModal').modal('hide');
+                              alert(data.msg);
+                              location.reload();
+                          },
+                          error: function(){
+                              alert("修改失败");
+                          }
+                      });
+                  });
               }
 
           </script>
 
 
           <style type="text/css">
-            button  {
-              background:#b5cfd2 url('css/bulecell.jpg');
-            }
             tr.font {
               font-size: 20px;
             }

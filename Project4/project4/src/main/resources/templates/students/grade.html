@@ -71,7 +71,7 @@
           <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
           <ul class="list-unstyled">
             <li class="active"><a th:href="@{/students/StuScores/{cid}(cid=${cid})}"> </i>我的成绩 </a></li>
-            <li><a th:href="@{/students/AllCourse}"></i>签到情况 </a></li>
+            <li><a th:href="@{/students/checkArrived/{cid}(cid=${cid})}"></i>签到情况 </a></li>
             <li><a th:href="@{/studentMain}"> <i class="icon-interface-windows"></i>返回学生主页 </a></li>
           </ul>
         </nav>
@@ -85,17 +85,16 @@
           <!-- Dashboard Header Section    -->
           <div >
             <br>
-            <table class="table table-hover table-bordered" border="1"align="center">
+            <table id="table" class="table table-hover table-bordered" border="1"align="center">
 
-              <thead><tr class="font" align="center"><th>章节</th><th>成绩</th></tr></thead>
+              <thead><tr class="font" align="center"><th>章节</th><th>重要性</th><th>成绩</th></tr></thead>
               <tbody>
               <tr th:each="c,cState:${chapters}" align="center">
-                <span >
-                  <td th:text="${c.toString()}"></td>
-                </span>
-                <span th:each="s,sState:${scores}">
-                  <td th:if="${cState.index}==${sState.index}" th:text="${s.toString()}"></td>
-                </span>
+                <td th:text="${c.toString()}"></td>
+
+                <td th:each="h,hState:${hardness}" th:if="${cState.index}==${hState.index}" th:text="${h}+'⭐'"></td>
+
+                <td th:each="s,sState:${scores}" th:if="${cState.index}==${sState.index}" th:text="${s}"></td>
               </tr>
               </tbody>
             </table>
@@ -112,8 +111,22 @@
                         var chapter=[[${chapters}]];
                         var score=[[${scores}]];
                         var averScore=[[${CourseAver}]];
-                        console.log(averScore);
                         /*]]>*/
+
+                        window.onload=function () {
+                            for (var i=1;i<[[${chapters}]].length+1;i++){
+                                var score=document.getElementById("table").rows[i].cells[2].innerHTML;
+                                var s=Number(score);
+                                if(s<60){
+                                    document.getElementById("table").rows[i].cells[2].style.cssText="color:red;";
+                                }else if(s>=60 && s<=65){
+                                    document.getElementById("table").rows[i].cells[2].style.cssText="color:#ffd811;";
+                                }else if(s>90){
+                                    document.getElementById("table").rows[i].cells[2].style.cssText="color:#39c764;";
+                                }
+                            }
+
+                        }
                     </script>
                   </div>
                 </div>
@@ -140,5 +153,6 @@
     <script th:src="@{/static/js/charts-home.js}"></script>
     <!-- Main File-->
     <script th:src="@{/static/js/front.js}"></script>
+    </div>
   </body>
 </html>

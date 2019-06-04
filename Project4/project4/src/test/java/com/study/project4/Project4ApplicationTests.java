@@ -2,6 +2,7 @@ package com.study.project4;
 
 import com.study.project4.com.entity.Course;
 import com.study.project4.com.entity.Course_Students;
+import com.study.project4.com.entity.Student;
 import com.study.project4.com.entity.Teacher;
 import com.study.project4.com.service.AdminService;
 import com.study.project4.com.service.CourseService;
@@ -289,6 +290,56 @@ public class Project4ApplicationTests {
         }
         for (Course_Students cs:qiandao){
             System.out.println(cs.getStudent().getId());
+        }
+
+    }
+
+
+    //某门课未正式加入课程的学生
+    @Test
+    public void OtherStudents(){
+        List<Student> otherStu=new ArrayList<>();
+        List<Student> students = studentService.getStuAll();
+        for (Student student : students) {
+            int id = student.getId();
+            Course_Students c_stu = studentService.getScores(1, id);//判断学生是否添加过该课程
+            if (c_stu != null ) {
+                //判断该学生是否存在于该课程下
+                //如果添加过，判断是否已经成功添加到课程,如果还没正式添加到课程，则依旧显示
+                if ( c_stu.getIfjoin()!=2 && c_stu.getIfjoin()!=3){
+                    otherStu.add(student);
+                    System.out.println(student);
+                }
+            }else {
+                System.out.println(student);
+                otherStu.add(student);
+            }
+        }
+
+
+    }
+    @Test
+    //对即将挂科的人警告
+    public void testJava(){
+        List<Course_Students> course_students=studentService.getScoresAll(1);
+        List<Course_Students> stu=new ArrayList<Course_Students>();//即将挂科的人名单
+        for(Course_Students cs:course_students) {
+            int aCount=0;//签到的次数
+            String die = cs.getArrived();
+            if (!die.equals("")) {
+                String[] a=die.split(",");
+                for(int i=0;i<a.length;i++){
+                    if (a[i].equals("0")) {
+                        aCount++;
+                    }
+                }
+                double x=aCount*1.0/a.length;
+                System.out.println(x);
+                if (x>0.34) {
+                    stu.add(cs);
+                    System.out.println(cs.getStudent().getSname());
+                }
+            }
         }
 
     }

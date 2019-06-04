@@ -9,6 +9,51 @@ public class Course {
     String chapters;
     String  counts;
     String ifqiandao;
+    int open;
+    String information;
+    String hardness;
+    String scores;
+    String type;
+
+    public String getScores() {
+        return scores;
+    }
+
+    public void setScores(String scores) {
+        this.scores = scores;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getHardness() {
+        return hardness;
+    }
+
+    public void setHardness(String hardness) {
+        this.hardness = hardness;
+    }
+
+    public String getInformation() {
+        return information;
+    }
+
+    public void setInformation(String information) {
+        this.information = information;
+    }
+
+    public int getOpen() {
+        return open;
+    }
+
+    public void setOpen(int open) {
+        this.open = open;
+    }
 
     public String getIfqiandao() {
         return ifqiandao;
